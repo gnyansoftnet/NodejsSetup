@@ -35,8 +35,8 @@ const SEED_CONFIG = {
         password: process.env.SEED_ADMIN_PASSWORD!,
     },
     common: {
-        modifiedBy: process.env.MODIFIEDBY!,
-        createdBy: process.env.CREATEDBY!
+        modifiedBy: process.env.SEED_MODIFIEDBY!,
+        createdBy: process.env.SEED_CREATEDBY!
 
     }
 };
