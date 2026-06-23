@@ -11,13 +11,13 @@ export class Role {
     @Column({ name: "role_name" })
     roleName!: string;
 
-    @Column({ name: "created_by", type: "varchar", })
+    @Column({ name: "created_by", type: "varchar", nullable: true })
     createdBy!: string | null;
 
     @CreateDateColumn({ name: "created_at" })
     createdAt!: Date;
 
-    @Column({ name: "modified_by", type: "varchar", })
+    @Column({ name: "modified_by", type: "varchar", nullable: true })
     modifiedBy!: string | null;
 
     @UpdateDateColumn({ name: "modified_at" })
