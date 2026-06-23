@@ -1,5 +1,5 @@
 import jwt, { JwtPayload, Secret, SignOptions } from "jsonwebtoken";
-import { injectable } from "tsyringe";
+import { injectable, singleton } from "tsyringe";
 
 const ACCESS_SECRET: Secret =
     process.env.ACCESS_SECRET || "access_secret";
@@ -8,6 +8,7 @@ const REFRESH_SECRET: Secret =
     process.env.REFRESH_SECRET || "refresh_secret";
 
 @injectable()
+@singleton()
 export class TokenService {
     generateAccessToken(payload: object): string {
         const options: SignOptions = {

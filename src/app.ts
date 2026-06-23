@@ -6,6 +6,7 @@ import rateLimit from "express-rate-limit";
 import { corsErrorHandler, corsMiddleware, handlePreflight } from "./middlewares/cors.middleware";
 import { corsLogger } from "./utils/cors-logger";
 import { errorMiddleware } from "./middlewares/error.middleware";
+import authRoute from "./routes/auth.route";
 
 const app = express();
 
@@ -38,6 +39,8 @@ app.get("/management/health", (_req: express.Request, res: express.Response) => 
         version: process.env.npm_package_version || "1.0.0"
     });
 });
+
+app.use("/api/auth", authRoute);
 
 app.use((req: express.Request, res: express.Response) => {
     res.status(404).json({
