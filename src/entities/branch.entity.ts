@@ -11,10 +11,10 @@ export class Branch {
     @Column({ name: "branch_name" })
     branchName!: string;
 
-    @Column({ name: "branch_short_name" })
+    @Column({ name: "branch_short_name", unique: true })
     branchShortName!: string;
 
-    @Column({ name: "branch_code" })
+    @Column({ name: "branch_code", unique: true })
     branchCode!: string;
 
 

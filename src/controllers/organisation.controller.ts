@@ -1,21 +1,20 @@
-import { inject, injectable } from "tsyringe";
-import { OrganisationService } from "../services/organisation.service";
+import { inject, injectable, singleton } from "tsyringe";
 import { asyncHandler } from "../utils/async.handler";
 import { Request, Response, NextFunction } from "express";
 import { sendCreated, sendSuccess } from "../utils/response.util";
+import { IOrganisationService } from "../services/organisation.service";
 
-
+@singleton()
 @injectable()
 export class OrganisationController {
-
     constructor(
-        @inject(OrganisationService)
-        private organisationService: OrganisationService
+        @inject("IOrganisationService")
+        private orgService: IOrganisationService
     ) { }
 
     createOrganisation = asyncHandler(async (req: Request, res: Response) => {
         const createdBy = req.query.createdBy as string;
-        const org = await this.organisationService.createOrganisation(req.body, createdBy);
+        const org = await this.orgService.createOrganisation(req.body);
         return sendCreated(res, org, "organisation created successfully");
     });
 
@@ -24,28 +23,27 @@ export class OrganisationController {
             orgId: string;
             modifiedBy: string;
         }
-        const org = await this.organisationService.updateOrganisation(parseInt(orgId), req.body, modifiedBy);
+        const org = await this.orgService.updateOrganisation(parseInt(orgId), req.body);
         return sendSuccess(res, org, "organisation updated successfully");
     });
     getOrganisationById = asyncHandler(async (req: Request, res: Response) => {
         const orgId = Number(req.params.orgId);
-        const organisations = await this.organisationService.getOrganisationById(orgId);
+        const organisations = await this.orgService.getOrganisationById(orgId);
         return sendSuccess(res, organisations);
     });
 
-    getOrganisationsPaginated = asyncHandler(async (req: Request, res: Response) => {
+    getOrganisations = asyncHandler(async (req: Request, res: Response) => {
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;
         const search = req.query.search as string | undefined;
-
-        const organisations = await this.organisationService.getOrganisationsPaginated(page, limit, search);
+        const organisations = await this.orgService.getOrganisations(page, limit, search);
         return sendSuccess(res, organisations);
     });
 
     deleteOrganisation = asyncHandler(async (req: Request, res: Response) => {
         const orgId = Number(req.query.orgId);
         const modifiedBy = Number(req.query.modifiedBy);
-        await this.organisationService.deleteOrganisation(orgId, modifiedBy);
+        await this.orgService.deleteOrganisation(orgId, modifiedBy);
         return sendSuccess(res, "organisation deleted successfully");
     });
 }

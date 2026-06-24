@@ -121,4 +121,7 @@ export class BaseRepository<T extends ObjectLiteral> {
         });
         return { data, total, page, limit, totalPages: Math.ceil(total / limit) };
     }
+    createQueryBuilder(alias: string) {
+        return this.repository.createQueryBuilder(alias);
+    }
 }

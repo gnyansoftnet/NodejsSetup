@@ -1,11 +1,12 @@
 // src/routes/role.routes.ts
 import { Router } from "express";
-import { userController } from "../container";
+import { container } from "tsyringe";
+import { UserController } from "../controllers/user.controller";
 
 const router = Router();
-
-router.post("/login", userController.loginUser);
-router.post("/validateLogin", userController.validateLogin);
+const controller = container.resolve(UserController);
+router.post("/login", controller.loginUser);
+router.post("/validateLogin", controller.validateLogin);
 
 
 

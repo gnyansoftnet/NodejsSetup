@@ -1,16 +1,16 @@
 import { inject, injectable } from "tsyringe";
-import { UserService } from "../services/user.service";
 import { asyncHandler } from "../utils/async.handler";
 import { Request, Response, NextFunction } from "express";
 import { sendCreated, sendSuccess } from "../utils/response.util";
+import { IUserService } from "../services/user.service";
 
 
 @injectable()
 export class UserController {
 
     constructor(
-        @inject(UserService)
-        private userService: UserService
+        @inject("IUserService")
+        private userService: IUserService
     ) { }
 
     loginUser = asyncHandler(async (req: Request, res: Response) => {
