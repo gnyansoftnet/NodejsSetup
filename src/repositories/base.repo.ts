@@ -41,9 +41,21 @@ export class BaseRepository<T extends ObjectLiteral> {
         });
     }
 
-    async findById(id: number): Promise<T | null> {
+    // async findById(id: number): Promise<T | null> {
+    //     return this.repository.findOne({
+    //         where: { [this.primaryKey]: id } as any
+    //     });
+    // }
+
+    async findById(
+        id: number,
+        includeDeleted: boolean = false
+    ): Promise<T | null> {
         return this.repository.findOne({
-            where: { [this.primaryKey]: id } as any
+            where: {
+                [this.primaryKey]: id,
+                ...(includeDeleted ? {} : { dFlag: false })
+            } as any
         });
     }
 
@@ -65,8 +77,7 @@ export class BaseRepository<T extends ObjectLiteral> {
         return this.findById(id);
     }
 
-    // ✅ Soft delete using dFlag — matches your entity
-    async delete(id: number, deletedBy?: string): Promise<boolean> {
+    async delete(id: number, deletedBy?: number): Promise<boolean> {
         const result = await this.repository.update(
             { [this.primaryKey]: id } as any,
             { dFlag: true, modifiedBy: deletedBy ?? null } as any

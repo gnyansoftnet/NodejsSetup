@@ -5,13 +5,16 @@ import { DeepPartial } from "typeorm";
 import { generateOrgCode } from "../utils/generate_org_code";
 import { AppError } from "../utils/app-error";
 import { PaginatedResultDto } from "../dtos/paginated.result.dto";
+import { UserRepository } from "../repositories/user.repo";
 
 
 @injectable()
 export class OrganisationService {
     constructor(
         @inject(OrganisationRepository)
-        private organisationRepo: OrganisationRepository
+        private organisationRepo: OrganisationRepository,
+        @inject(UserRepository)
+        private userRepo: UserRepository,
     ) { }
 
     async createOrganisation(
@@ -53,7 +56,7 @@ export class OrganisationService {
         data: DeepPartial<Organisation>,
         modifiedBy: string
     ): Promise<Organisation> {
-        const org = await this.organisationRepo.findByOrgId(orgId);
+        const org = await this.organisationRepo.findById(orgId);
         if (!org) throw new AppError(404, "Organisation not found");
         if (org.dFlag) throw new AppError(400, "Cannot update a deleted organisation");
         if (data.orgShortName && data.orgShortName !== org.orgShortName) {
@@ -77,6 +80,14 @@ export class OrganisationService {
         if (!updatedOrg) throw new AppError(400, "Cannot update organisation");
         return updatedOrg;
     }
+    async getOrganisationById(
+        orgId: number
+    ): Promise<Organisation> {
+        const organisation = await this.organisationRepo.findById(orgId);
+        if (!organisation) throw new AppError(404, "Organisation not found");
+        return organisation;
+
+    }
 
     async getOrganisationsPaginated(
         page: number,
@@ -98,13 +109,20 @@ export class OrganisationService {
         };
     }
 
-    async getOrganisationById(
-        orgId: number
-    ): Promise<Organisation> {
-        const organisation = await this.organisationRepo.findByOrgId(orgId);
+
+    async deleteOrganisation(
+        orgId: number,
+        modifiedBy: number
+    ) {
+        const organisation = await this.organisationRepo.findById(orgId);
         if (!organisation) throw new AppError(404, "Organisation not found");
-        return organisation;
+        const user = await this.userRepo.findById(modifiedBy);
+        if (!user) throw new AppError(404, "User  not found");
+        await this.organisationRepo.delete(orgId, modifiedBy);
+
 
     }
+
+
 
 }

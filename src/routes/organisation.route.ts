@@ -12,6 +12,7 @@ router.use(authMiddleware);
 // router.use(permissionMiddleware(PageId.ORGANISATION));
 router.post("/createOrganisation", organisationController.createOrganisation);
 router.put("/updateOrganisation", organisationController.updateOrganisation);
+router.put("/deleteOrganisation", organisationController.deleteOrganisation);
 router.get("/getAllOrganisation", organisationController.getOrganisationsPaginated);
 router.get("/getOrganisationById/:orgId", organisationController.getOrganisationById);
 

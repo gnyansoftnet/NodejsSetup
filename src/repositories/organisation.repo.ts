@@ -10,11 +10,7 @@ export class OrganisationRepository extends BaseRepository<Organisation> {
     }
 
 
-    async findByOrgId(orgId: number): Promise<Organisation | null> {
-        return this.repository.findOne({
-            where: { orgId, dFlag: false }
-        });
-    }
+
 
     async findOrganisationPaginated(
         page: number,

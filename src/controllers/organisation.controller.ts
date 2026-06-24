@@ -41,4 +41,11 @@ export class OrganisationController {
         const organisations = await this.organisationService.getOrganisationsPaginated(page, limit, search);
         return sendSuccess(res, organisations);
     });
+
+    deleteOrganisation = asyncHandler(async (req: Request, res: Response) => {
+        const orgId = Number(req.query.orgId);
+        const modifiedBy = Number(req.query.modifiedBy);
+        await this.organisationService.deleteOrganisation(orgId, modifiedBy);
+        return sendSuccess(res, "organisation deleted successfully");
+    });
 }
