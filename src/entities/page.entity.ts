@@ -10,7 +10,7 @@ export class Page {
     pageName!: string;
 
 
-    @Column({ name: "module_icon", type: "varchar", nullable: true })
+    @Column({ name: "page_icon", type: "varchar", nullable: true })
     pageIcon!: string | null
 
     @Column({ name: "created_by", type: "varchar", nullable: true })

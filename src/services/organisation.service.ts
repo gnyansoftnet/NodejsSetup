@@ -4,6 +4,7 @@ import { OrganisationRepository } from "../repositories/organisation.repo";
 import { DeepPartial } from "typeorm";
 import { generateOrgCode } from "../utils/generate_org_code";
 import { AppError } from "../utils/app-error";
+import { PaginatedResultDto } from "../dtos/paginated.result.dto";
 
 
 @injectable()
@@ -81,8 +82,28 @@ export class OrganisationService {
         page: number,
         limit: number,
         search?: string
-    ) {
+    ): Promise<PaginatedResultDto<Organisation>> {
+        const { data, total } = await this.organisationRepo.findOrganisationPaginated(page, limit, search);
+        const totalPages = Math.ceil(total / limit);
+        return {
+            data,
+            pagination: {
+                total,
+                page,
+                limit,
+                totalPages,
+                hasNextPage: page < totalPages,
+                hasPrevPage: page > 1,
+            },
+        };
+    }
 
+    async getOrganisationById(
+        orgId: number
+    ): Promise<Organisation> {
+        const organisation = await this.organisationRepo.findByOrgId(orgId);
+        if (!organisation) throw new AppError(404, "Organisation not found");
+        return organisation;
 
     }
 

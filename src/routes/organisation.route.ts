@@ -9,8 +9,10 @@ import { PageId } from "../constants/page-id.enum";
 
 const router = Router();
 router.use(authMiddleware);
-router.use(permissionMiddleware(PageId.ORGANISATION));
-router.get("/createOrganisation", organisationController.createOrganisation);
-router.get("/updateOrganisation", organisationController.updateOrganisation);
+// router.use(permissionMiddleware(PageId.ORGANISATION));
+router.post("/createOrganisation", organisationController.createOrganisation);
+router.put("/updateOrganisation", organisationController.updateOrganisation);
+router.get("/getAllOrganisation", organisationController.getOrganisationsPaginated);
+router.get("/getOrganisationById/:orgId", organisationController.getOrganisationById);
 
 export default router;

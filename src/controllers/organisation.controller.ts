@@ -27,4 +27,18 @@ export class OrganisationController {
         const org = await this.organisationService.updateOrganisation(parseInt(orgId), req.body, modifiedBy);
         return sendSuccess(res, org, "organisation updated successfully");
     });
+    getOrganisationById = asyncHandler(async (req: Request, res: Response) => {
+        const orgId = Number(req.params.orgId);
+        const organisations = await this.organisationService.getOrganisationById(orgId);
+        return sendSuccess(res, organisations);
+    });
+
+    getOrganisationsPaginated = asyncHandler(async (req: Request, res: Response) => {
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 10;
+        const search = req.query.search as string | undefined;
+
+        const organisations = await this.organisationService.getOrganisationsPaginated(page, limit, search);
+        return sendSuccess(res, organisations);
+    });
 }

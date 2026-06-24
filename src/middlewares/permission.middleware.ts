@@ -23,11 +23,14 @@ export const permissionMiddleware = (pgId: number) => {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const orgId = parseHeaderId(req.headers["orgId"]);
-            const branchId = parseHeaderId(req.headers["branchId"]);
-            const roleId = parseHeaderId(req.headers["roleId"]);
-            const userId = parseHeaderId(req.headers["userId"]);
 
+
+            const userId: number = (req as any).user?.userId;
+            const orgId: number = (req as any).user?.orgId;
+            const branchId: number = (req as any).user?.branchId;
+            const roleId: number = (req as any).user?.roleId;
+
+            console.log(userId + "================")
             if (!userId) {
                 throw new AppError(401, "Unauthorized: missing user context.");
             }

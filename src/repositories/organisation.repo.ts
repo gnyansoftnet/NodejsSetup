@@ -16,7 +16,7 @@ export class OrganisationRepository extends BaseRepository<Organisation> {
         });
     }
 
-    async findPaginated(
+    async findOrganisationPaginated(
         page: number,
         limit: number,
         search?: string
