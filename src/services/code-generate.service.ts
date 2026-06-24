@@ -1,8 +1,5 @@
 import { inject, injectable, singleton } from "tsyringe";
-import { DataSource, Repository } from "typeorm";
-import { Organisation } from "../entities/organisation.entity";
 import { AppError } from "../utils/app-error";
-import { Branch } from "../entities/branch.entity";
 import { OrganisationRepository } from "../repositories/organisation.repo";
 import { BranchRepository } from "../repositories/branch.repo";
 
@@ -47,7 +44,7 @@ export class CodeGenerateService {
         const lastOrg = await this.branchRepo
             .createQueryBuilder("branch")
             .where("branch.branch_code LIKE :prefix", { prefix: `${prefix}%` })
-            .orderBy("organisation.branch_code", "DESC")
+            .orderBy("branch.branch_code", "DESC")
             .getOne();
 
         if (!lastOrg) {
