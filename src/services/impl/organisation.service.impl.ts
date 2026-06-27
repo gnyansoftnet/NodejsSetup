@@ -7,6 +7,7 @@ import { PaginatedResultDto } from "../../dtos/paginated.result.dto";
 import { UserRepository } from "../../repositories/user.repo";
 import { CodeGenerateService } from "../code-generate.service";
 import { IOrganisationService } from "../organisation.service";
+import { OrgCreateDto } from "../../dtos/org-create.dto";
 
 
 @injectable()
@@ -20,12 +21,13 @@ export class OrganisationServiceImpl implements IOrganisationService {
         private codeService: CodeGenerateService,
     ) { }
     async createOrganisation(
-        data: DeepPartial<Organisation>,
+        data: OrgCreateDto,
     ): Promise<Organisation> {
+        const user = this.userRepo.exists({
+            where: { userCode: data.createdBy, dFlag: false }
+        });
+        if (!user) throw new AppError(404, "user not found!");
 
-        if (!data.orgShortName) {
-            throw new AppError(400, "Organisation short name is required");
-        }
         const shortNameExists = await this.organisationRepo.exists({
             where: { orgShortName: data.orgShortName, dFlag: false }
         });
@@ -44,15 +46,27 @@ export class OrganisationServiceImpl implements IOrganisationService {
         }
 
         return this.organisationRepo.create({
-            ...data,
-            orgCode,
+            orgName: data.orgName,
+            orgShortName: data.orgShortName,
+            orgCode: orgCode,
+            address: data.address,
+            orgPhone: data.orgPhone,
+            tinNumber: data.tinNumber,
+            orgGSTINNumber: data.orgGSTINNumber,
+            deptLogo: data.logo,
+            faxNumber: data.faxNumber,
+            orgPAN: data.orgPAN,
+            orgRegNumber: data.orgRegNumber,
+            cashAccountNumber: data.cashAccountNumber,
+            wesite: data.website,
+            serviceTax: data.serviceTax,
             dFlag: false,
-            createdBy: '"createdBy"'
+            createdBy: data.createdBy,
         });
     }
 
 
-    
+
     async updateOrganisation(
         orgId: number,
         data: DeepPartial<Organisation>,

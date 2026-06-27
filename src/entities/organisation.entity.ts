@@ -11,10 +11,10 @@ export class Organisation {
     @Column({ name: "org_name" })
     orgName!: string;
 
-    @Column({ name: "org_short_name",unique:true })
+    @Column({ name: "org_short_name", })
     orgShortName!: string;
 
-    @Column({ name: "org_code" ,unique:true})
+    @Column({ name: "org_code", unique: true })
     orgCode!: string;
 
     @Column({ name: "org_Reg_Number", type: "varchar", nullable: true })

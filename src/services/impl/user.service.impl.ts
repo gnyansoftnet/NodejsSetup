@@ -54,6 +54,7 @@ export class UserServiceImpl implements IUserService {
 
 
     async validateLogin(
+
         userId: number,
         orgId: number,
         branchId: number,
@@ -84,6 +85,7 @@ export class UserServiceImpl implements IUserService {
             );
         }
         const payLoad = {
+            userCode: user.userCode,
             userId: user.userId,
             orgId: selectedContext.organisation.orgId,
             branchId: selectedContext.branch.branchId,
