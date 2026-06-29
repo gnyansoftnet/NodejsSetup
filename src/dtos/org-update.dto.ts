@@ -4,17 +4,21 @@ import {
 } from "class-validator";
 import { Transform } from "class-transformer";
 
-export class OrgCreateDto {
-    @IsNotEmpty({ message: "orgName can not be empty" })
+export class OrgUpdateDto {
+
+    @IsNotEmpty({ message: "midifiedBy by can not be blank" })
+    modifiedBy!: string;
+
+    @IsNotEmpty({ message: "orgId can not be blank" })
+    orgId!: number
+
+    @IsOptional()
     @Transform(({ value }) => value?.trim())
-    orgName!: string
+    orgName?: string
 
-    @IsNotEmpty({ message: "organisation orgShortName can not be blank" })
+    @IsOptional()
     @Transform(({ value }) => value?.trim().toUpperCase())
-    orgShortName!: string;
-
-    @IsNotEmpty({ message: "created by can not be blank" })
-    createdBy!: string;
+    orgShortName?: string;
 
     @IsOptional()
     address?: string;

@@ -8,6 +8,7 @@ import { UserRepository } from "../../repositories/user.repo";
 import { CodeGenerateService } from "../code-generate.service";
 import { IOrganisationService } from "../organisation.service";
 import { OrgCreateDto } from "../../dtos/org-create.dto";
+import { OrgUpdateDto } from "../../dtos/org-update.dto";
 
 
 @injectable()
@@ -68,13 +69,11 @@ export class OrganisationServiceImpl implements IOrganisationService {
 
 
     async updateOrganisation(
-        orgId: number,
-        data: DeepPartial<Organisation>,
-
+        data: OrgUpdateDto,
     ): Promise<Organisation> {
-        const org = await this.organisationRepo.findById(orgId);
+        const org = await this.organisationRepo.findById(data.orgId);
         if (!org) throw new AppError(404, "Organisation not found");
-        if (org.dFlag) throw new AppError(400, "Cannot update a deleted organisation");
+
         if (data.orgShortName && data.orgShortName !== org.orgShortName) {
             const exists = await this.organisationRepo.exists({
                 where: { orgShortName: data.orgShortName, dFlag: false }
@@ -82,16 +81,23 @@ export class OrganisationServiceImpl implements IOrganisationService {
             if (exists) throw new AppError(400, "Organisation short name already exist");
         }
 
-        if (data.orgCode && data.orgCode !== org.orgCode) {
-            const exists = await this.organisationRepo.exists({
-                where: { orgCode: data.orgCode, dFlag: false }
-            });
-            if (exists) throw new AppError(400, "Organisation code already exist");
-        }
-
         const updatedOrg = await this.organisationRepo.update(
-            orgId,
-            { ...data, modifiedBy: "modifiedBy" }
+            data.orgId, {
+            orgName: data.orgName,
+            orgShortName: data.orgShortName,
+            address: data.address,
+            orgPhone: data.orgPhone,
+            tinNumber: data.tinNumber,
+            orgGSTINNumber: data.orgGSTINNumber,
+            deptLogo: data.logo,
+            faxNumber: data.faxNumber,
+            orgPAN: data.orgPAN,
+            orgRegNumber: data.orgRegNumber,
+            cashAccountNumber: data.cashAccountNumber,
+            wesite: data.website,
+            serviceTax: data.serviceTax,
+            modifiedBy: data.modifiedBy,
+        }
         );
         if (!updatedOrg) throw new AppError(400, "Cannot update organisation");
         return updatedOrg;

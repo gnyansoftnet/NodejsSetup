@@ -3,6 +3,8 @@ import { asyncHandler } from "../utils/async.handler";
 import { Request, Response, NextFunction } from "express";
 import { sendCreated, sendSuccess } from "../utils/response.util";
 import { IOrganisationService } from "../services/organisation.service";
+import { OrgCreateDto } from "../dtos/org-create.dto";
+import { OrgUpdateDto } from "../dtos/org-update.dto";
 
 @singleton()
 @injectable()
@@ -13,17 +15,15 @@ export class OrganisationController {
     ) { }
 
     createOrganisation = asyncHandler(async (req: Request, res: Response) => {
-        const createdBy = req.query.createdBy as string;
-        const org = await this.orgService.createOrganisation(req.body);
+        const orgCreateDto: OrgCreateDto = req.body;
+        const org = await this.orgService.createOrganisation(orgCreateDto);
         return sendCreated(res, org, "organisation created successfully");
     });
 
+    
     updateOrganisation = asyncHandler(async (req: Request, res: Response) => {
-        const { orgId, modifiedBy } = req.query as {
-            orgId: string;
-            modifiedBy: string;
-        }
-        const org = await this.orgService.updateOrganisation(parseInt(orgId), req.body);
+           const orgUpdateDto: OrgUpdateDto = req.body;
+        const org = await this.orgService.updateOrganisation(orgUpdateDto);
         return sendSuccess(res, org, "organisation updated successfully");
     });
     getOrganisationById = asyncHandler(async (req: Request, res: Response) => {
