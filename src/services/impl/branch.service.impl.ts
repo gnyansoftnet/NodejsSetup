@@ -8,10 +8,13 @@ import { UserRepository } from "../../repositories/user.repo";
 import { BranchRepository } from "../../repositories/branch.repo";
 import { Branch } from "../../entities/branch.entity";
 import { CodeGenerateService } from "../code-generate.service";
+import { IBranchService } from "../branch.service";
+import { BranchCreateDto } from "../../dtos/branch-create.dto";
+import { BranchUpdateDto } from "../../dtos/branch-update.dto";
 
 
 @injectable()
-export class BranchServiceImpl {
+export class BranchServiceImpl implements IBranchService {
     constructor(
         @inject(OrganisationRepository)
         private organisationRepo: OrganisationRepository,
@@ -26,13 +29,9 @@ export class BranchServiceImpl {
     }
 
     async createBranch(
-        data: DeepPartial<Branch>,
-        createdBy: string
+        data: BranchCreateDto,
     ): Promise<Branch> {
 
-        if (!data.branchShortName) {
-            throw new AppError(400, "Branch short name is required");
-        }
         const shortNameExists = await this.branchRepo.exists({
             where: { branchShortName: data.branchShortName, dFlag: false }
         });
@@ -49,91 +48,58 @@ export class BranchServiceImpl {
         if (existOrgCode) {
             throw new AppError(400, "Branch code already exist");
         }
+        const org = await this.organisationRepo.findById(data.orgId);
+        if (!org) throw new AppError(400, "Branch code already exist");
 
         return this.branchRepo.create({
-            ...data,
-            branchCode,
+            branchName: data.branchName,
+            branchShortName: data.branchShortName,
+            branchCode: branchCode,
+            createdBy: data.createdBy,
             dFlag: false,
-            createdBy: createdBy
+            organisation: org,
         });
     }
 
 
-    // async updateOrganisation(
-    //     branchId: number,
+    async updateBranch(data: BranchUpdateDto): Promise<Branch> {
+        const branch = await this.branchRepo.findById(data.branchId);
+        if (!branch) throw new AppError(404, "Branch not found");
 
-    //     data: DeepPartial<Branch>,
-    //     modifiedBy: string
-    // ): Promise<Branch> {
-    //     const branch = await this.branchRepo.findById(branchId);
-    //     if (!branch) throw new AppError(404, "Branch not found");
-    //     if (branch.dFlag) throw new AppError(400, "Cannot update a deleted branch");
-    //     if (data.branchShortName && data.branchShortName !== branch.branchShortName) {
-    //         const exists = await this.branchRepo.exists({
-    //             where: { branchShortName: data.branchShortName, dFlag: false }
-    //         });
-    //         if (exists) throw new AppError(400, "Branch short name already exist");
-    //     }
+        const updateBranch = await this.branchRepo.update(
+            data.branchId, {
+            branchName: data.branchName,
+            branchShortName: data.branchShortName,
+            modifiedBy: data.modifiedBy,
+        });
+        if (!updateBranch) throw new AppError(400, "Cannot update branch");
+        return updateBranch;
 
-    //     if (data.branchCode && data.branchCode !== branch.branchCode) {
-    //         const exists = await this.branchRepo.exists({
-    //             where: { branchCode: data.branchCode, dFlag: false }
-    //         });
-    //         if (exists) throw new AppError(400, "Branch code already exist");
-    //     }
-
-    //     const updatedBranch = await this.organisationRepo.update(
-    //         branchId,
-    //         { ...data, modifiedBy: modifiedBy }
-    //     );
-    //     if (!updatedBranch) throw new AppError(400, "Cannot update branch");
-    //     return updatedBranch;
-    // }
-
-
-    // async getOrganisationById(
-    //     orgId: number
-    // ): Promise<Organisation> {
-    //     const organisation = await this.organisationRepo.findById(orgId);
-    //     if (!organisation) throw new AppError(404, "Organisation not found");
-    //     return organisation;
-
-    // }
-
-    // async getOrganisationsPaginated(
-    //     page: number,
-    //     limit: number,
-    //     search?: string
-    // ): Promise<PaginatedResultDto<Organisation>> {
-    //     const { data, total } = await this.organisationRepo.findOrganisationPaginated(page, limit, search);
-    //     const totalPages = Math.ceil(total / limit);
-    //     return {
-    //         data,
-    //         pagination: {
-    //             total,
-    //             page,
-    //             limit,
-    //             totalPages,
-    //             hasNextPage: page < totalPages,
-    //             hasPrevPage: page > 1,
-    //         },
-    //     };
-    // }
-
-
-    // async deleteOrganisation(
-    //     orgId: number,
-    //     modifiedBy: number
-    // ) {
-    //     const organisation = await this.organisationRepo.findById(orgId);
-    //     if (!organisation) throw new AppError(404, "Organisation not found");
-    //     const user = await this.userRepo.findById(modifiedBy);
-    //     if (!user) throw new AppError(404, "User  not found");
-    //     await this.organisationRepo.delete(orgId, modifiedBy);
-
-
-    // }
-
-
-
+    }
+    async deleteBranch(branchId: number): Promise<boolean> {
+        const branch = await this.branchRepo.findById(branchId);
+        if (!branch) throw new AppError(404, "Branch not found");
+        await this.branchRepo.delete(branchId);
+        return true;
+    }
+    async getBranchById(branchId: number): Promise<Branch> {
+        const branch = await this.branchRepo.findById(branchId);
+        if (!branch) throw new AppError(404, "Organisation not found");
+        return branch;
+    }
+    async getbranchesByorgId(orgId: number, page: number, limit: number, search?: string): Promise<PaginatedResultDto<Branch>> {
+        const { data, total } = await this.branchRepo.findBranchPaginated(orgId, page, limit, search);
+        const totalPages = Math.ceil(total / limit);
+        return {
+            data,
+            pagination: {
+                total,
+                page,
+                limit,
+                totalPages,
+                hasNextPage: page < totalPages,
+                hasPrevPage: page > 1,
+            },
+        };
+    }
 }

@@ -9,5 +9,5 @@ export interface IOrganisationService {
     updateOrganisation(dto: OrgUpdateDto): Promise<Organisation>;
     getOrganisationById(orgId: number): Promise<Organisation>;
     getOrganisations(page: number, limit: number, search?: string): Promise<PaginatedResultDto<Organisation>>;
-    deleteOrganisation(orgId: number, modifiedBy: number): Promise<boolean>;
+    deleteOrganisation(orgId: number): Promise<boolean>;
 }

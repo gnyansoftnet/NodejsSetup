@@ -46,7 +46,7 @@ export class OrganisationServiceImpl implements IOrganisationService {
             throw new AppError(400, "Organisation code already exist");
         }
 
-        return this.organisationRepo.create({
+        return await this.organisationRepo.create({
             orgName: data.orgName,
             orgShortName: data.orgShortName,
             orgCode: orgCode,
@@ -132,14 +132,11 @@ export class OrganisationServiceImpl implements IOrganisationService {
 
 
     async deleteOrganisation(
-        orgId: number,
-        modifiedBy: number
+        orgId: number
     ): Promise<boolean> {
         const organisation = await this.organisationRepo.findById(orgId);
         if (!organisation) throw new AppError(404, "Organisation not found");
-        const user = await this.userRepo.findById(modifiedBy);
-        if (!user) throw new AppError(404, "User  not found");
-        await this.organisationRepo.delete(orgId, modifiedBy);
+        await this.organisationRepo.delete(orgId);
         return true;
     }
 

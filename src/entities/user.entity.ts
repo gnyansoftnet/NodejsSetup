@@ -15,7 +15,7 @@ export class User {
     @Column({ name: "password" })
     password!: string;
 
-    @Column({ name: "user_code", unique: true })
+    @Column({ name: "user_code" })
     userCode!: string;
 
     @Column({ name: "status" })

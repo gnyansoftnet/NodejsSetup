@@ -20,9 +20,9 @@ export class OrganisationController {
         return sendCreated(res, org, "organisation created successfully");
     });
 
-    
+
     updateOrganisation = asyncHandler(async (req: Request, res: Response) => {
-           const orgUpdateDto: OrgUpdateDto = req.body;
+        const orgUpdateDto: OrgUpdateDto = req.body;
         const org = await this.orgService.updateOrganisation(orgUpdateDto);
         return sendSuccess(res, org, "organisation updated successfully");
     });
@@ -42,8 +42,8 @@ export class OrganisationController {
 
     deleteOrganisation = asyncHandler(async (req: Request, res: Response) => {
         const orgId = Number(req.query.orgId);
-        const modifiedBy = Number(req.query.modifiedBy);
-        await this.orgService.deleteOrganisation(orgId, modifiedBy);
+
+        await this.orgService.deleteOrganisation(orgId);
         return sendSuccess(res, "organisation deleted successfully");
     });
 }

@@ -10,11 +10,13 @@ import { AppDataSource } from "../config/database.config";
 import { CodeGenerateService } from "../services/code-generate.service";
 import { OrganisationServiceImpl } from "../services/impl/organisation.service.impl";
 import { UserServiceImpl } from "../services/impl/user.service.impl";
+import { BranchServiceImpl } from "../services/impl/branch.service.impl";
 
 container.registerInstance(DataSource, AppDataSource);
 
 // register interface token → concrete class
 container.register("IOrganisationService", { useClass: OrganisationServiceImpl });
+container.register("IBranchService", { useClass: BranchServiceImpl });
 container.register("IUserService", { useClass: UserServiceImpl });
 
 

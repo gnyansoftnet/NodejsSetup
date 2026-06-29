@@ -8,6 +8,7 @@ export class OrganisationRepository extends BaseRepository<Organisation> {
     constructor() {
         super(Organisation, "orgId");
     }
+    
     async findOrganisationPaginated(
         page: number,
         limit: number,
