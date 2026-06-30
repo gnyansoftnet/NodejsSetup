@@ -15,9 +15,9 @@ export class BranchRepository extends BaseRepository<Branch> {
     ): Promise<{ data: Branch[]; total: number }> {
         const query = this.repository
             .createQueryBuilder("branch")
+            .leftJoinAndSelect("branch.organisation", "organisation")
             .where("branch.dFlag = :dFlag", { dFlag: false })
             .andWhere("branch.org_id = :orgId", { orgId });
-
         if (search) {
             query.andWhere(
                 "(branch.branchName LIKE :search OR branch.branchShortName LIKE :search OR branch.branchCode LIKE :search)",

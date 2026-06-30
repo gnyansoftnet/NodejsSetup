@@ -73,11 +73,25 @@ export class RoleSeriviceImpl implements IRoleService {
         await this.roleRepo.delete(roleId);
         return true;
     }
-    getRolesByOrgId(orgId: number): Promise<PaginatedResultDto<Role>> {
-        throw new Error("Method not implemented.");
+    async getRolesByOrgId(orgId: number, page: number, limit: number, search?: string): Promise<PaginatedResultDto<Role>> {
+        const { data, total } = await this.roleRepo.findRolePaginated(orgId, page, limit, search);
+        const totalPages = Math.ceil(total / limit);
+        return {
+            data,
+            pagination: {
+                total,
+                page,
+                limit,
+                totalPages,
+                hasNextPage: page < totalPages,
+                hasPrevPage: page > 1,
+            },
+        };
     }
-    getRoleById(roleId: number): Promise<Role> {
-        throw new Error("Method not implemented.");
+    async getRoleById(roleId: number): Promise<Role> {
+        const role = await this.roleRepo.findById(roleId);
+        if (!role) throw new AppError(404, "Role not found");
+        return role;
     }
 
 }
