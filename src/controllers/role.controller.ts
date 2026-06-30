@@ -3,6 +3,7 @@ import { IRoleService } from "../services/role.serive";
 import { Request, Response, NextFunction } from "express";
 import { asyncHandler } from "../utils/async.handler";
 import { sendCreated, sendSuccess } from "../utils/response.util";
+import { requirePositiveInt, requireString } from "../utils/validators";
 
 @singleton()
 @injectable()
@@ -13,19 +14,24 @@ export class RoleController {
     ) { }
 
 
-    createBranch = asyncHandler(async (req: Request, res: Response) => {
-        const { roleName, createdBy, orgId } = req.body;
+    createRole = asyncHandler(async (req: Request, res: Response) => {
+        const roleName = requireString(req.body.roleName, "Role name", 50);
+        const createdBy = requireString(req.body.createdBy, "Created by");
+        const orgId = requirePositiveInt(req.body.orgId, "Organisation ID");
         const role = await this.roleService.createRole(roleName, createdBy, orgId);
         return sendCreated(res, role, "Role created successfully");
     });
 
 
     updateRole = asyncHandler(async (req: Request, res: Response) => {
-        const { roleId, roleName, modifiedBy, orgId } = req.body;
+        const roleName = requireString(req.body.roleName, "Role name", 50);
+        const modifiedBy = requireString(req.body.modifiedBy, "modifiedBy");
+        const orgId = requirePositiveInt(req.body.orgId, "Organisation ID");
+        const roleId = requirePositiveInt(req.body.roleId, "Role ID");
         const role = await this.roleService.updateRole(roleId, roleName, modifiedBy, orgId);
         return sendSuccess(res, role, "Branch updated successfully");
     });
-    getBranchById = asyncHandler(async (req: Request, res: Response) => {
+    getRoleById = asyncHandler(async (req: Request, res: Response) => {
         const roleId = Number(req.params.branchId);
         const role = await this.roleService.getRoleById(roleId);
         return sendSuccess(res, role);

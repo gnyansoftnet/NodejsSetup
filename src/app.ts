@@ -10,6 +10,7 @@ import { errorMiddleware } from "./middlewares/error.middleware";
 import authRoute from "./routes/auth.route";
 import organisationRoute from "./routes/organisation.route";
 import branchRoute from "./routes/branch.route";
+import roleRoute from "./routes/role.route";
 
 const app = express();
 
@@ -46,6 +47,7 @@ app.get("/management/health", (_req: express.Request, res: express.Response) => 
 app.use("/api/auth", authRoute);
 app.use("/api/organisation", organisationRoute);
 app.use("/api/branch", branchRoute);
+app.use("/api/Role", roleRoute);
 
 app.use((req: express.Request, res: express.Response) => {
     res.status(404).json({

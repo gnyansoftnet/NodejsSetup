@@ -34,6 +34,7 @@ export class RoleSeriviceImpl implements IRoleService {
         });
         if (role) throw new AppError(400, "Role already exist!");
         return await this.roleRepo.create({
+            createdBy: createdBy,
             roleName: roleName,
             dFlag: false,
             organisation: org,
@@ -57,6 +58,7 @@ export class RoleSeriviceImpl implements IRoleService {
         if (role) throw new AppError(400, "Role already exist!");
         const updateRole = await this.roleRepo.update(roleId, {
             roleName: roleName,
+            modifiedBy: modifiedBy,
             dFlag: false,
             organisation: org,
         });

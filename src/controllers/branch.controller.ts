@@ -42,7 +42,7 @@ export class BranchController {
     });
 
     deleteBranch = asyncHandler(async (req: Request, res: Response) => {
-        const branchId = Number(req.query.orgId);
+        const branchId = Number(req.query.branchId);
         await this.branchService.deleteBranch(branchId);
         return sendSuccess(res, "Branch deleted successfully");
     });
