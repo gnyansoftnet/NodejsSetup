@@ -9,6 +9,7 @@ import { CodeGenerateService } from "../code-generate.service";
 import { IOrganisationService } from "../organisation.service";
 import { OrgCreateDto } from "../../dtos/org-create.dto";
 import { OrgUpdateDto } from "../../dtos/org-update.dto";
+import { logger } from "../../utils/logger";
 
 
 @injectable()
@@ -24,9 +25,10 @@ export class OrganisationServiceImpl implements IOrganisationService {
     async createOrganisation(
         data: OrgCreateDto,
     ): Promise<Organisation> {
-        const user = this.userRepo.exists({
+        const user = await this.userRepo.exists({
             where: { userCode: data.createdBy, dFlag: false }
         });
+
         if (!user) throw new AppError(404, "user not found!");
 
         const shortNameExists = await this.organisationRepo.exists({
@@ -61,6 +63,7 @@ export class OrganisationServiceImpl implements IOrganisationService {
             cashAccountNumber: data.cashAccountNumber,
             wesite: data.website,
             serviceTax: data.serviceTax,
+            orgEmail: data.orgEmail,
             dFlag: false,
             createdBy: data.createdBy,
         });
@@ -71,6 +74,11 @@ export class OrganisationServiceImpl implements IOrganisationService {
     async updateOrganisation(
         data: OrgUpdateDto,
     ): Promise<Organisation> {
+        const user = await this.userRepo.exists({
+            where: { userCode: data.modifiedBy, dFlag: false }
+        });
+
+        if (!user) throw new AppError(404, "user not found!");
         const org = await this.organisationRepo.findById(data.orgId);
         if (!org) throw new AppError(404, "Organisation not found");
 
@@ -95,6 +103,7 @@ export class OrganisationServiceImpl implements IOrganisationService {
             orgRegNumber: data.orgRegNumber,
             cashAccountNumber: data.cashAccountNumber,
             wesite: data.website,
+            orgEmail: data.orgEmail,
             serviceTax: data.serviceTax,
             modifiedBy: data.modifiedBy,
         }

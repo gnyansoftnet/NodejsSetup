@@ -26,6 +26,11 @@ export class OrgCreateDto {
     @Matches(/^[0-9]{10}$/, { message: "orgPhone must be 10 digits" })
     orgPhone?: string;
 
+
+    @IsOptional()
+    orgEmail?: string;
+
+
     @IsOptional()
     website?: string;
 

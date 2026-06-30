@@ -31,6 +31,9 @@ export class OrgUpdateDto {
     orgPhone?: string;
 
     @IsOptional()
+    orgEmail?: string;
+
+    @IsOptional()
     website?: string;
 
     @IsOptional()
