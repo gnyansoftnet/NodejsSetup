@@ -31,6 +31,11 @@ export class BranchServiceImpl implements IBranchService {
     async createBranch(
         data: BranchCreateDto,
     ): Promise<Branch> {
+        const user = await this.userRepo.exists({
+            where: { userCode: data.createdBy, dFlag: false }
+        });
+
+        if (!user) throw new AppError(404, "user not found!");
 
         const shortNameExists = await this.branchRepo.exists({
             where: { branchShortName: data.branchShortName, dFlag: false }
@@ -42,14 +47,14 @@ export class BranchServiceImpl implements IBranchService {
 
         const branchCode = await this.codeService.generateOrgCode(data.branchShortName);
 
-        const existOrgCode = await this.branchRepo.exists({
+        const existBranch = await this.branchRepo.exists({
             where: { branchCode: branchCode, dFlag: false }
         });
-        if (existOrgCode) {
+        if (existBranch) {
             throw new AppError(400, "Branch code already exist");
         }
         const org = await this.organisationRepo.findById(data.orgId);
-        if (!org) throw new AppError(400, "Branch code already exist");
+        if (!org) throw new AppError(400, "Organisation not found");
 
         return this.branchRepo.create({
             branchName: data.branchName,
@@ -63,6 +68,11 @@ export class BranchServiceImpl implements IBranchService {
 
 
     async updateBranch(data: BranchUpdateDto): Promise<Branch> {
+        const user = await this.userRepo.exists({
+            where: { userCode: data.modifiedBy, dFlag: false }
+        });
+
+        if (!user) throw new AppError(404, "user not found!");
         const branch = await this.branchRepo.findById(data.branchId);
         if (!branch) throw new AppError(404, "Branch not found");
 

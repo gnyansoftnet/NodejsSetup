@@ -30,7 +30,7 @@ export class BranchController {
         return sendSuccess(res, org, "Branch updated successfully");
     });
     getBranchById = asyncHandler(async (req: Request, res: Response) => {
-        const branchId = Number(req.params.orgId);
+        const branchId = Number(req.params.branchId);
         const branch = await this.branchService.getBranchById(branchId);
         return sendSuccess(res, branch);
     });

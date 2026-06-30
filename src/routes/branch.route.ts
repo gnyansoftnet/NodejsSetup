@@ -14,6 +14,6 @@ router.post("/createBranch", validateDto(BranchCreateDto), controller.createBran
 router.put("/updateBranch", validateDto(BranchUpdateDto), controller.updateBranch);
 router.delete("/deleteBranch", controller.deleteBranch);
 router.get("/getAllBranch", controller.getbranchesByorgId);
-router.get("/getBranchById/:orgId", controller.getBranchById);
+router.get("/getBranchById/:branchId", controller.getBranchById);
 
 export default router;

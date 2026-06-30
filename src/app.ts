@@ -9,6 +9,7 @@ import { corsLogger } from "./utils/cors-logger";
 import { errorMiddleware } from "./middlewares/error.middleware";
 import authRoute from "./routes/auth.route";
 import organisationRoute from "./routes/organisation.route";
+import branchRoute from "./routes/branch.route";
 
 const app = express();
 
@@ -44,6 +45,7 @@ app.get("/management/health", (_req: express.Request, res: express.Response) => 
 
 app.use("/api/auth", authRoute);
 app.use("/api/organisation", organisationRoute);
+app.use("/api/branch", branchRoute);
 
 app.use((req: express.Request, res: express.Response) => {
     res.status(404).json({

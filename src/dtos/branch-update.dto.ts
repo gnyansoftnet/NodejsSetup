@@ -12,8 +12,10 @@ export class BranchUpdateDto {
     @IsNotEmpty({ message: "modifiedBy can not be empty" })
     modifiedBy!: string;
 
+    @IsOptional()
     branchName?: string;
 
+    @IsOptional()
     branchShortName?: string;
 
 
