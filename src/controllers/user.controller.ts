@@ -3,6 +3,7 @@ import { asyncHandler } from "../utils/async.handler";
 import { Request, Response, NextFunction } from "express";
 import { sendCreated, sendSuccess } from "../utils/response.util";
 import { IUserService } from "../services/user.service";
+import { UserCreateDto } from "../dtos/user-create.dto";
 
 
 @injectable()
@@ -23,6 +24,45 @@ export class UserController {
         const { userId, orgId, branchId } = req.body;
         const user = await this.userService.validateLogin(userId, orgId, branchId);
         return sendSuccess(res, user, "User validate successfully");
+    });
+
+
+
+    createUser = asyncHandler(async (req: Request, res: Response) => {
+        const userCreateDto: UserCreateDto = req.body;
+        const user = await this.userService.createUser(userCreateDto);
+        return sendCreated(res, user, "User created successfully");
+    });
+
+
+    // updateRole = asyncHandler(async (req: Request, res: Response) => {
+    //     const roleName = requireString(req.body.roleName, "Role name", 50);
+    //     const modifiedBy = requireString(req.body.modifiedBy, "modifiedBy");
+    //     const orgId = requirePositiveInt(req.body.orgId, "Organisation ID");
+    //     const roleId = requirePositiveInt(req.body.roleId, "Role ID");
+    //     const role = await this.roleService.updateRole(roleId, roleName, modifiedBy, orgId);
+    //     return sendSuccess(res, role, "Branch updated successfully");
+    // });
+
+    getUserById = asyncHandler(async (req: Request, res: Response) => {
+        const userId = Number(req.params.userId);
+        const user = await this.userService.getUserById(userId);
+        return sendSuccess(res, user);
+    });
+
+    getUsersByorgId = asyncHandler(async (req: Request, res: Response) => {
+        const orgId = Number(req.query.orgId);
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 10;
+        const search = req.query.search as string | undefined;
+        const users = await this.userService.getUsersByorgId(orgId, page, limit, search);
+        return sendSuccess(res, users);
+    });
+
+    deleteUser = asyncHandler(async (req: Request, res: Response) => {
+        const userId = Number(req.params.userId);
+        await this.userService.deleteUser(userId);
+        return sendSuccess(res, "User deleted successfully");
     });
 
 }

@@ -12,6 +12,7 @@ import { OrganisationRepository } from "../../repositories/organisation.repo";
 import { BranchRepository } from "../../repositories/branch.repo";
 import { UserOrgBranchRoleRepository } from "../../repositories/user-org-branch-role.repo";
 import { CodeGenerateService } from "../code-generate.service";
+import { PaginatedResultDto } from "../../dtos/paginated.result.dto";
 
 
 
@@ -37,6 +38,36 @@ export class UserServiceImpl implements IUserService {
         @inject(CodeGenerateService)
         private codeService: CodeGenerateService,
     ) { }
+    async deleteUser(userId: number): Promise<boolean> {
+        const user = await this.userRepository.findById(userId);
+        if (!user) {
+            throw new AppError(404, "User not found");
+        }
+        await this.userRepository.delete(userId);
+        return true;
+    }
+    async getUsersByorgId(orgId: number, page: number, limit: number, search?: string): Promise<PaginatedResultDto<User>> {
+        const { data, total } = await this.userRepository.findUsersByOrgId(orgId, page, limit, search);
+        const totalPages = Math.ceil(total / limit);
+        return {
+            data,
+            pagination: {
+                total,
+                page,
+                limit,
+                totalPages,
+                hasNextPage: page < totalPages,
+                hasPrevPage: page > 1,
+            },
+        };
+    }
+    async getUserById(userId: number): Promise<User> {
+        const user = await this.userRepository.findById(userId);
+        if (!user) {
+            throw new AppError(404, "User not found");
+        }
+        return user;
+    }
     async createUser(data: UserCreateDto): Promise<User> {
         const existUser = await this.userRepository.exists({
             where: {

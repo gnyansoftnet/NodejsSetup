@@ -9,7 +9,7 @@ import { CodeGenerateService } from "../services/code-generate.service";
 import { OrganisationServiceImpl } from "../services/impl/organisation.service.impl";
 import { UserServiceImpl } from "../services/impl/user.service.impl";
 import { BranchServiceImpl } from "../services/impl/branch.service.impl";
-import { RoleSeriviceImpl } from "../services/impl/role.serive.impl";
+import { RoleSeriviceImpl } from "../services/impl/role.service.impl";
 
 container.registerInstance(DataSource, AppDataSource);
 
