@@ -11,9 +11,9 @@ import { Organisation } from "./organisation.entity";
 import { Branch } from "./branch.entity";
 import { Role } from "./role.entity";
 
-@Entity("user_org_branch")
-@Unique(["user", "organisation", "branch"])
-export class UserOrgBranch {
+@Entity("user_org_branch_role")
+@Unique(["user", "organisation", "branch", "role"])
+export class UserOrgBranchRole {
 
     @PrimaryGeneratedColumn({ name: "id" })
     id!: number;

@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Organisation } from "./organisation.entity";
-import { UserOrgBranch } from "./user-organisation-branch.entity";
+import { UserOrgBranchRole } from "./user-org-branch-role.entity";
 
 @Entity("branches")
 export class Branch {
@@ -39,9 +39,9 @@ export class Branch {
     organisation!: Organisation;
 
     @OneToMany(
-        () => UserOrgBranch,
+        () => UserOrgBranchRole,
         uob => uob.branch
     )
-    userOrgBranches!: UserOrgBranch[];
+    userOrgBranches!: UserOrgBranchRole[];
 
 }

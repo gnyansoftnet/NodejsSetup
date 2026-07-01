@@ -4,8 +4,9 @@ import { Organisation } from "../entities/organisation.entity";
 import { Branch } from "../entities/branch.entity";
 import { Role } from "../entities/role.entity";
 import { User } from "../entities/user.entity";
-import { UserOrgBranch } from "../entities/user-organisation-branch.entity";
+
 import { UserStatus } from "../constants/user-status.enum";
+import { UserOrgBranchRole } from "../entities/user-org-branch-role.entity";
 
 
 
@@ -57,7 +58,7 @@ export const seedAdminUser = async () => {
 
         const userRepo = queryRunner.manager.getRepository(User);
 
-        const userOrgBranchRepo = queryRunner.manager.getRepository(UserOrgBranch);
+        const userOrgBranchRepo = queryRunner.manager.getRepository(UserOrgBranchRole);
 
         let organisation = await orgRepo.findOne({
             where: { orgCode: SEED_CONFIG.org.code, dFlag: false }

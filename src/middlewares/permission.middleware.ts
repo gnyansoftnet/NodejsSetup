@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { RolePermission } from "../entities/role-permission.entity";
 import { UserPermission } from "../entities/user-permission.entity";
-import { UserOrgBranch } from "../entities/user-organisation-branch.entity";
+import { UserOrgBranch } from "../entities/user-org-branch-role.entity";
 import { AppError } from "../utils/app-error";
 import { AppDataSource } from "../config/database.config";
 

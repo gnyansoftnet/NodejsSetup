@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Token } from "./token.entity";
-import { UserOrgBranch } from "./user-organisation-branch.entity";
 import { UserStatus } from "../constants/user-status.enum";
+import { UserOrgBranchRole } from "./user-org-branch-role.entity";
 
 
 @Entity("users")
@@ -21,6 +21,9 @@ export class User {
 
     @Column({ default: UserStatus.Active, type: "enum", enum: UserStatus, name: "status" })
     status!: string
+
+    @Column({ name: "full_name", type: "varchar", nullable: true })
+    fullName!: string | null;
 
     @Column({ name: "email", type: "varchar", nullable: true })
     email!: string | null;
@@ -54,9 +57,9 @@ export class User {
     tokens!: Token[];
 
     @OneToMany(
-        () => UserOrgBranch,
+        () => UserOrgBranchRole,
         uob => uob.user
     )
-    userOrgBranches!: UserOrgBranch[];
+    userOrgBranches!: UserOrgBranchRole[];
 
 }

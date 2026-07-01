@@ -15,6 +15,7 @@ export class RoleRepository extends BaseRepository<Role> {
     ): Promise<{ data: Role[]; total: number }> {
         const query = this.repository
             .createQueryBuilder("role")
+            .leftJoinAndSelect("role.organisation", "organisation")
             .where("role.dFlag = :dFlag", { dFlag: false })
             .andWhere("role.org_id = :orgId", { orgId });
 

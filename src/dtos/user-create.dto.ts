@@ -7,48 +7,50 @@ import {
     IsEnum,
     IsDateString,
     Matches,
-    MaxLength
+    MaxLength,
+    IsInt
 } from "class-validator";
 
 import { UserStatus } from "../constants/user-status.enum";
 
 export class UserCreateDto {
 
-    @IsNotEmpty({ message: "userName cannot be empty" })
-    @MaxLength(100)
+    @IsString()
+    @IsNotEmpty()
     userName!: string;
 
-    @IsNotEmpty({ message: "password cannot be empty" })
+    @IsString()
+    @IsNotEmpty()
     password!: string;
 
+    @IsNotEmpty()
+    @IsEnum(UserStatus)
+    status!: UserStatus;
 
-    @IsNotEmpty({ message: "status cannot be empty" })
-    @IsEnum(UserStatus, {
-        message: "status must be a valid UserStatus"
-    })
-    status?: UserStatus;
+    @IsNotEmpty({ message: "createdBy is required" })
+    createdBy!: string;
+
+    @IsInt()
+    @IsNotEmpty()
+    orgId!: number;
+
+    @IsInt()
+    @IsNotEmpty()
+    branchId!: number;
+
+    @IsInt()
+    @IsNotEmpty()
+    roleId!: number;
 
     @IsOptional()
-    @IsEmail({}, {
-        message: "email must be a valid email address"
-    })
+    @IsEmail()
     email?: string;
 
     @IsOptional()
-    @Matches(/^[0-9]{10}$/, {
-        message: "phoneNumber must contain exactly 10 digits"
-    })
+    @Matches(/^[0-9]{10}$/, { message: "Phone number must be a 10-digit number" })
     phoneNumber?: string;
 
     @IsOptional()
-    profilePic?: string;
+    fullName?: string
 
-    @IsOptional()
-    @IsDateString({}, {
-        message: "DOB must be a valid date (YYYY-MM-DD)"
-    })
-    DOB?: string;
-
-    @IsOptional()
-    createdBy?: string;
 }
