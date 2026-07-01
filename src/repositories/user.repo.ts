@@ -18,9 +18,9 @@ export class UserRepository extends BaseRepository<User> {
     ): Promise<{ data: User[]; total: number }> {
         const query = this.repository
             .createQueryBuilder("user")
-            .leftJoinAndSelect("user.organisation", "organisation")
-            .where("user.dFlag = :dFlag", { dFlag: false })
-            .andWhere("user.org_id = :orgId", { orgId });
+            .leftJoinAndSelect("user.userOrgBranches", "uobr")
+            .leftJoinAndSelect("uobr.organisation", "org")
+            .andWhere("org.orgId = :orgId", { orgId });
         if (search) {
             query.andWhere(
                 "(user.userName LIKE :search OR user.userCode LIKE :search OR user.email LIKE :search)",
