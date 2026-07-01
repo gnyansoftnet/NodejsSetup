@@ -8,7 +8,7 @@ export class OrganisationRepository extends BaseRepository<Organisation> {
     constructor() {
         super(Organisation, "orgId");
     }
-    
+
     async findOrganisationPaginated(
         page: number,
         limit: number,
@@ -25,7 +25,7 @@ export class OrganisationRepository extends BaseRepository<Organisation> {
         }
         const offset = (page - 1) * limit;
         const [data, total] = await query
-            .orderBy("org.createdDate", "DESC")
+            .orderBy("org.createdAt", "DESC")
             .limit(limit)
             .offset(offset)
             .getManyAndCount();

@@ -32,7 +32,7 @@ export class RoleController {
         return sendSuccess(res, role, "Branch updated successfully");
     });
     getRoleById = asyncHandler(async (req: Request, res: Response) => {
-        const roleId = Number(req.params.branchId);
+        const roleId = Number(req.params.roleId);
         const role = await this.roleService.getRoleById(roleId);
         return sendSuccess(res, role);
     });

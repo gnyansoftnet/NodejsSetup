@@ -11,6 +11,6 @@ router.post("/createRole", controller.createRole);
 router.put("/updateRole", controller.updateRole);
 router.delete("/deleteRole", controller.deleteRole);
 router.get("/getRolesByOrgId", controller.getRolesByOrgId);
-router.get("/getBranchById/:roleId", controller.getRoleById);
+router.get("/getRoleById/:roleId", controller.getRoleById);
 
 export default router;

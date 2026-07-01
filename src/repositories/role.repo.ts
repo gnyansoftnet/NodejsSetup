@@ -26,7 +26,7 @@ export class RoleRepository extends BaseRepository<Role> {
         }
         const offset = (page - 1) * limit;
         const [data, total] = await query
-            .orderBy("role.createdDate", "DESC")
+            .orderBy("role.createdAt", "DESC")
             .limit(limit)
             .offset(offset)
             .getManyAndCount();

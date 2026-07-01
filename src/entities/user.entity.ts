@@ -1,6 +1,7 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Token } from "./token.entity";
 import { UserOrgBranch } from "./user-organisation-branch.entity";
+import { UserStatus } from "../constants/user-status.enum";
 
 
 @Entity("users")
@@ -18,7 +19,7 @@ export class User {
     @Column({ name: "user_code" })
     userCode!: string;
 
-    @Column({ name: "status" })
+    @Column({ default: UserStatus.Active, type: "enum", enum: UserStatus, name: "status" })
     status!: string
 
     @Column({ name: "email", type: "varchar", nullable: true })
