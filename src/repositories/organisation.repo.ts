@@ -25,7 +25,7 @@ export class OrganisationRepository extends BaseRepository<Organisation> {
         }
         const offset = (page - 1) * limit;
         const [data, total] = await query
-            .orderBy("org.createdAt", "DESC")
+            .orderBy("org.createdDate", "DESC")
             .limit(limit)
             .offset(offset)
             .getManyAndCount();

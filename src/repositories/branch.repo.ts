@@ -26,7 +26,7 @@ export class BranchRepository extends BaseRepository<Branch> {
         }
         const offset = (page - 1) * limit;
         const [data, total] = await query
-            .orderBy("branch.createdAt", "DESC")
+            .orderBy("branch.createdDate", "DESC")
             .limit(limit)
             .offset(offset)
             .getManyAndCount();
