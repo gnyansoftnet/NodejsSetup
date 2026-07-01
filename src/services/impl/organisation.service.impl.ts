@@ -10,6 +10,7 @@ import { IOrganisationService } from "../organisation.service";
 import { OrgCreateDto } from "../../dtos/org-create.dto";
 import { OrgUpdateDto } from "../../dtos/org-update.dto";
 import { logger } from "../../utils/logger";
+import { AppConstants } from "../../constants/app.constants";
 
 
 @injectable()
@@ -125,9 +126,11 @@ export class OrganisationServiceImpl implements IOrganisationService {
         search?: string
     ): Promise<PaginatedResultDto<Organisation>> {
         const { data, total } = await this.organisationRepo.findOrganisationPaginated(page, limit, search);
+        const filteredUsers = data
+            .filter(user => user.orgCode != AppConstants.SystemAdminOrgCode);
         const totalPages = Math.ceil(total / limit);
         return {
-            data,
+            data: filteredUsers,
             pagination: {
                 total,
                 page,

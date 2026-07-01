@@ -6,6 +6,7 @@ import { UserRepository } from "../../repositories/user.repo";
 import { RoleRepository } from "../../repositories/role.repo";
 import { AppError } from "../../utils/app-error";
 import { OrganisationRepository } from "../../repositories/organisation.repo";
+import { AppConstants } from "../../constants/app.constants";
 
 @injectable()
 export class RoleSeriviceImpl implements IRoleService {
@@ -77,9 +78,11 @@ export class RoleSeriviceImpl implements IRoleService {
     }
     async getRolesByOrgId(orgId: number, page: number, limit: number, search?: string): Promise<PaginatedResultDto<Role>> {
         const { data, total } = await this.roleRepo.findRolePaginated(orgId, page, limit, search);
+        const filteredRoles = data
+            .filter(user => user.roleName != AppConstants.SystemAdminRoleName);
         const totalPages = Math.ceil(total / limit);
         return {
-            data,
+            data: filteredRoles,
             pagination: {
                 total,
                 page,

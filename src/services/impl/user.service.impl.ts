@@ -13,6 +13,7 @@ import { BranchRepository } from "../../repositories/branch.repo";
 import { UserOrgBranchRoleRepository } from "../../repositories/user-org-branch-role.repo";
 import { CodeGenerateService } from "../code-generate.service";
 import { PaginatedResultDto } from "../../dtos/paginated.result.dto";
+import { AppConstants } from "../../constants/app.constants";
 
 
 
@@ -48,9 +49,11 @@ export class UserServiceImpl implements IUserService {
     }
     async getUsersByorgId(orgId: number, page: number, limit: number, search?: string): Promise<PaginatedResultDto<User>> {
         const { data, total } = await this.userRepository.findUsersByOrgId(orgId, page, limit, search);
+        const filteredUsers = data
+            .filter(user => user.userName != AppConstants.SystemAdminUserName);
         const totalPages = Math.ceil(total / limit);
         return {
-            data,
+            data: filteredUsers,
             pagination: {
                 total,
                 page,

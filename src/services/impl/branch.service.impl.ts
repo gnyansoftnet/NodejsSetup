@@ -11,6 +11,7 @@ import { CodeGenerateService } from "../code-generate.service";
 import { IBranchService } from "../branch.service";
 import { BranchCreateDto } from "../../dtos/branch-create.dto";
 import { BranchUpdateDto } from "../../dtos/branch-update.dto";
+import { AppConstants } from "../../constants/app.constants";
 
 
 @injectable()
@@ -99,9 +100,11 @@ export class BranchServiceImpl implements IBranchService {
     }
     async getbranchesByorgId(orgId: number, page: number, limit: number, search?: string): Promise<PaginatedResultDto<Branch>> {
         const { data, total } = await this.branchRepo.findBranchPaginated(orgId, page, limit, search);
+        const filteredUsers = data
+            .filter(user => user.branchCode != AppConstants.SystemAdminBranchCode);
         const totalPages = Math.ceil(total / limit);
         return {
-            data,
+            data: filteredUsers,
             pagination: {
                 total,
                 page,

@@ -48,8 +48,8 @@ app.get("/management/health", (_req: express.Request, res: express.Response) => 
 app.use("/api/auth", authRoute);
 app.use("/api/organisation", organisationRoute);
 app.use("/api/branch", branchRoute);
-app.use("/api/Role", roleRoute);
-app.use("/api/User", userRoute);
+app.use("/api/role", roleRoute);
+app.use("/api/user", userRoute);
 
 app.use((req: express.Request, res: express.Response) => {
     res.status(404).json({
