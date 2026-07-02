@@ -14,6 +14,9 @@ import { UserOrgBranchRoleRepository } from "../../repositories/user-org-branch-
 import { CodeGenerateService } from "../code-generate.service";
 import { PaginatedResultDto } from "../../dtos/paginated.result.dto";
 import { AppConstants } from "../../constants/app.constants";
+import { UserUpdateDto } from "../../dtos/user-update.dto";
+import { AppDataSource } from "../../config/database.config";
+import { UserOrgBranchRole } from "../../entities/user-org-branch-role.entity";
 
 
 
@@ -39,6 +42,79 @@ export class UserServiceImpl implements IUserService {
         @inject(CodeGenerateService)
         private codeService: CodeGenerateService,
     ) { }
+
+    async updateUser(data: UserUpdateDto): Promise<User> {
+        const existModifiedBy = await this.userRepository.exists({
+            where: { userCode: data.modifiedBy, dFlag: false },
+        });
+        if (!existModifiedBy) {
+            throw new AppError(404, "ModifiedBy user does not exist");
+        }
+
+        const targetUser = await this.userRepository.findById(data.userId);
+        if (!targetUser) {
+            throw new AppError(404, "User not found");
+        }
+
+        if (data.userName && data.userName !== targetUser.userName) {
+            const duplicate = await this.userRepository.findOne({
+                where: { userName: data.userName, dFlag: false },
+            });
+            if (duplicate && duplicate.userId !== data.userId) {
+                throw new AppError(409, "User name already in use");
+            }
+        }
+
+        let role: any, org: any, branch: any;
+
+        if (data.roleId) {
+            role = await this.roleRepo.findOne({ where: { roleId: data.roleId, dFlag: false } });
+            if (!role) throw new AppError(404, "Role not found");
+        }
+        if (data.orgId) {
+            org = await this.orgRepo.findOne({ where: { orgId: data.orgId, dFlag: false } });
+            if (!org) throw new AppError(404, "Organisation not found");
+        }
+        if (data.branchId) {
+            branch = await this.branchRepo.findOne({ where: { branchId: data.branchId, dFlag: false } });
+            if (!branch) throw new AppError(404, "Branch not found");
+        }
+
+        return AppDataSource.transaction(async (manager) => {
+            const userRepo = manager.getRepository(User);
+            const mappingRepo = manager.getRepository(UserOrgBranchRole);
+
+            userRepo.merge(targetUser, {
+                userName: data.userName ?? targetUser.userName,
+                email: data.email ?? targetUser.email,
+                phoneNumber: data.phoneNumber ?? targetUser.phoneNumber,
+                fullName: data.fullName ?? targetUser.fullName,
+                status: data.status ?? targetUser.status,
+                modifiedBy: data.modifiedBy,
+            });
+            const savedUser = await userRepo.save(targetUser);
+
+            if (role || org || branch) {
+                const mapping = await mappingRepo.findOne({
+                    where: { user: { userId: data.userId } },
+                    relations: { role: true, organisation: true, branch: true },
+                });
+                if (!mapping) {
+                    throw new AppError(404, "User org/branch mapping not found");
+                }
+
+                if (role) mapping.role = role;
+                if (org) mapping.organisation = org;
+                if (branch) mapping.branch = branch;
+                await mappingRepo.save(mapping);
+            }
+
+            return savedUser;
+        });
+
+    }
+
+
     async deleteUser(userId: number): Promise<boolean> {
         const user = await this.userRepository.findById(userId);
         if (!user) {
@@ -79,7 +155,7 @@ export class UserServiceImpl implements IUserService {
             },
         });
         if (!existUser) {
-            throw new AppError(409, "CretedBy user does not exist");
+            throw new AppError(404, "CreatedBy user does not exist");
         }
 
         const user = await this.userRepository.findOne({
@@ -111,6 +187,7 @@ export class UserServiceImpl implements IUserService {
         if (!org) {
             throw new AppError(404, "Organisation not found");
         }
+
         const branch = await this.branchRepo.findOne({
             where: {
                 branchId: data.branchId,
@@ -123,25 +200,33 @@ export class UserServiceImpl implements IUserService {
 
         const hashedPassword = await this.passwordService.hash(data.password);
         const userCode = await this.codeService.generateUserCode(org.orgShortName);
-        const createUser = await this.userRepository.create({
-            userName: data.userName,
-            userCode: userCode,
-            password: hashedPassword,
-            email: data.email,
-            phoneNumber: data.phoneNumber,
-            fullName: data.fullName,
-            status: data.status,
+
+        return AppDataSource.transaction(async (manager) => {
+            const userRepo = manager.getRepository(User);
+            const mappingRepo = manager.getRepository(UserOrgBranchRole);
+
+            let createdUser = userRepo.create({
+                userName: data.userName,
+                userCode: userCode,
+                password: hashedPassword,
+                email: data.email,
+                phoneNumber: data.phoneNumber,
+                fullName: data.fullName,
+                status: data.status,
+                createdBy: data.createdBy,
+            });
+            createdUser = await userRepo.save(createdUser);
+
+            const mapping = mappingRepo.create({
+                user: createdUser,
+                organisation: org,
+                branch: branch,
+                role: role,
+            });
+            await mappingRepo.save(mapping);
+
+            return createdUser;
         });
-
-        await this.userOrgBranchRepo.create({
-            user: createUser,
-            organisation: org,
-            branch: branch,
-            role: role,
-        });
-
-        return createUser;
-
     }
 
 

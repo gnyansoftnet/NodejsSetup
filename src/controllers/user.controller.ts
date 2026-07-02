@@ -4,6 +4,7 @@ import { Request, Response, NextFunction } from "express";
 import { sendCreated, sendSuccess } from "../utils/response.util";
 import { IUserService } from "../services/user.service";
 import { UserCreateDto } from "../dtos/user-create.dto";
+import { UserUpdateDto } from "../dtos/user-update.dto";
 
 
 @injectable()
@@ -35,14 +36,11 @@ export class UserController {
     });
 
 
-    // updateRole = asyncHandler(async (req: Request, res: Response) => {
-    //     const roleName = requireString(req.body.roleName, "Role name", 50);
-    //     const modifiedBy = requireString(req.body.modifiedBy, "modifiedBy");
-    //     const orgId = requirePositiveInt(req.body.orgId, "Organisation ID");
-    //     const roleId = requirePositiveInt(req.body.roleId, "Role ID");
-    //     const role = await this.roleService.updateRole(roleId, roleName, modifiedBy, orgId);
-    //     return sendSuccess(res, role, "Branch updated successfully");
-    // });
+    updateUser = asyncHandler(async (req: Request, res: Response) => {
+        const userUpdateDto: UserUpdateDto = req.body;
+        const user = await this.userService.updateUser(userUpdateDto);
+        return sendSuccess(res, user, "User updated successfully");
+    });
 
     getUserById = asyncHandler(async (req: Request, res: Response) => {
         const userId = Number(req.params.userId);
