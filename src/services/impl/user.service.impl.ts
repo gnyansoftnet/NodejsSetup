@@ -17,6 +17,9 @@ import { AppConstants } from "../../constants/app.constants";
 import { UserUpdateDto } from "../../dtos/user-update.dto";
 import { AppDataSource } from "../../config/database.config";
 import { UserOrgBranchRole } from "../../entities/user-org-branch-role.entity";
+import { Organisation } from "../../entities/organisation.entity";
+import { Branch } from "../../entities/branch.entity";
+import { Role } from "../../entities/role.entity";
 
 
 
@@ -42,77 +45,6 @@ export class UserServiceImpl implements IUserService {
         @inject(CodeGenerateService)
         private codeService: CodeGenerateService,
     ) { }
-
-    async updateUser(data: UserUpdateDto): Promise<User> {
-        const existModifiedBy = await this.userRepository.exists({
-            where: { userCode: data.modifiedBy, dFlag: false },
-        });
-        if (!existModifiedBy) {
-            throw new AppError(404, "ModifiedBy user does not exist");
-        }
-
-        const targetUser = await this.userRepository.findById(data.userId);
-        if (!targetUser) {
-            throw new AppError(404, "User not found");
-        }
-
-        if (data.userName && data.userName !== targetUser.userName) {
-            const duplicate = await this.userRepository.findOne({
-                where: { userName: data.userName, dFlag: false },
-            });
-            if (duplicate && duplicate.userId !== data.userId) {
-                throw new AppError(409, "User name already in use");
-            }
-        }
-
-        let role: any, org: any, branch: any;
-
-        if (data.roleId) {
-            role = await this.roleRepo.findOne({ where: { roleId: data.roleId, dFlag: false } });
-            if (!role) throw new AppError(404, "Role not found");
-        }
-        if (data.orgId) {
-            org = await this.orgRepo.findOne({ where: { orgId: data.orgId, dFlag: false } });
-            if (!org) throw new AppError(404, "Organisation not found");
-        }
-        if (data.branchId) {
-            branch = await this.branchRepo.findOne({ where: { branchId: data.branchId, dFlag: false } });
-            if (!branch) throw new AppError(404, "Branch not found");
-        }
-
-        return AppDataSource.transaction(async (manager) => {
-            const userRepo = manager.getRepository(User);
-            const mappingRepo = manager.getRepository(UserOrgBranchRole);
-
-            userRepo.merge(targetUser, {
-                userName: data.userName ?? targetUser.userName,
-                email: data.email ?? targetUser.email,
-                phoneNumber: data.phoneNumber ?? targetUser.phoneNumber,
-                fullName: data.fullName ?? targetUser.fullName,
-                status: data.status ?? targetUser.status,
-                modifiedBy: data.modifiedBy,
-            });
-            const savedUser = await userRepo.save(targetUser);
-
-            if (role || org || branch) {
-                const mapping = await mappingRepo.findOne({
-                    where: { user: { userId: data.userId } },
-                    relations: { role: true, organisation: true, branch: true },
-                });
-                if (!mapping) {
-                    throw new AppError(404, "User org/branch mapping not found");
-                }
-
-                if (role) mapping.role = role;
-                if (org) mapping.organisation = org;
-                if (branch) mapping.branch = branch;
-                await mappingRepo.save(mapping);
-            }
-
-            return savedUser;
-        });
-
-    }
 
 
     async deleteUser(userId: number): Promise<boolean> {
@@ -147,88 +79,6 @@ export class UserServiceImpl implements IUserService {
         }
         return user;
     }
-    async createUser(data: UserCreateDto): Promise<User> {
-        const existUser = await this.userRepository.exists({
-            where: {
-                userCode: data.createdBy,
-                dFlag: false,
-            },
-        });
-        if (!existUser) {
-            throw new AppError(404, "CreatedBy user does not exist");
-        }
-
-        const user = await this.userRepository.findOne({
-            where: {
-                userName: data.userName,
-                dFlag: false,
-            },
-        });
-        if (user) {
-            throw new AppError(409, "User already exists");
-        }
-
-        const role = await this.roleRepo.findOne({
-            where: {
-                roleId: data.roleId,
-                dFlag: false,
-            },
-        });
-        if (!role) {
-            throw new AppError(404, "Role not found");
-        }
-
-        const org = await this.orgRepo.findOne({
-            where: {
-                orgId: data.orgId,
-                dFlag: false,
-            },
-        });
-        if (!org) {
-            throw new AppError(404, "Organisation not found");
-        }
-
-        const branch = await this.branchRepo.findOne({
-            where: {
-                branchId: data.branchId,
-                dFlag: false,
-            },
-        });
-        if (!branch) {
-            throw new AppError(404, "Branch not found");
-        }
-
-        const hashedPassword = await this.passwordService.hash(data.password);
-        const userCode = await this.codeService.generateUserCode(org.orgShortName);
-
-        return AppDataSource.transaction(async (manager) => {
-            const userRepo = manager.getRepository(User);
-            const mappingRepo = manager.getRepository(UserOrgBranchRole);
-
-            let createdUser = userRepo.create({
-                userName: data.userName,
-                userCode: userCode,
-                password: hashedPassword,
-                email: data.email,
-                phoneNumber: data.phoneNumber,
-                fullName: data.fullName,
-                status: data.status,
-                createdBy: data.createdBy,
-            });
-            createdUser = await userRepo.save(createdUser);
-
-            const mapping = mappingRepo.create({
-                user: createdUser,
-                organisation: org,
-                branch: branch,
-                role: role,
-            });
-            await mappingRepo.save(mapping);
-
-            return createdUser;
-        });
-    }
-
 
     async loginUser(
         userName: string,
@@ -330,6 +180,290 @@ export class UserServiceImpl implements IUserService {
 
     }
 
+    async updateUser(data: UserUpdateDto): Promise<User> {
+
+        const modifiedBy = await this.userRepository.findOne({
+            where: {
+                userCode: data.modifiedBy,
+                dFlag: false,
+            }
+        });
+
+        if (!modifiedBy) {
+            throw new AppError(404, "ModifiedBy user not found");
+        }
+
+        const targetUser = await this.userRepository.findOne({
+            where: {
+                userId: data.userId,
+                dFlag: false,
+            },
+            relations: {
+                userOrgBranches: {
+                    organisation: true,
+                    branch: true,
+                    role: true
+                }
+            }
+        });
+
+        if (!targetUser) {
+            throw new AppError(404, "User not found");
+        }
+
+        if (targetUser.userName !== data.userName) {
+
+            const duplicateUser = await this.userRepository.findOne({
+                where: {
+                    userName: data.userName,
+                    dFlag: false,
+                }
+            });
+
+            if (duplicateUser && duplicateUser.userId !== targetUser.userId) {
+                throw new AppError(409, "Username already exists");
+            }
+        }
 
 
+
+        return await AppDataSource.transaction(async manager => {
+
+            const userRepo = manager.getRepository(User);
+            const mappingRepo = manager.getRepository(UserOrgBranchRole);
+
+            targetUser.userName = data.userName;
+            targetUser.status = data.status;
+            targetUser.modifiedBy = data.modifiedBy;
+
+            targetUser.email = data.email ?? targetUser.email;
+            targetUser.phoneNumber = data.phoneNumber ?? targetUser.phoneNumber;
+            targetUser.fullName = data.fullName ?? targetUser.fullName;
+
+            const savedUser = await userRepo.save(targetUser);
+
+            await mappingRepo.delete({
+                user: {
+                    userId: savedUser.userId
+                }
+            });
+
+            for (const item of data.assignments) {
+                const organisation = await manager.getRepository(Organisation).findOne({
+                    where: {
+                        orgId: item.orgId,
+                        dFlag: false
+                    }
+                });
+                if (!organisation) {
+                    throw new AppError(404, `Organisation ${item.orgId} not found`);
+                }
+
+                const branch = await manager.getRepository(Branch).findOne({
+                    where: {
+                        branchId: item.branchId,
+                        organisation: {
+                            orgId: item.orgId
+                        },
+                        dFlag: false
+                    },
+                    relations: {
+                        organisation: true
+                    }
+                });
+
+                if (!branch) {
+                    throw new AppError(
+                        404,
+                        `Branch ${item.branchId} does not belong to Organisation ${item.orgId}`
+                    );
+                }
+
+                const role = await manager.getRepository(Role).findOne({
+                    where: {
+                        roleId: item.roleId,
+                        organisation: {
+                            orgId: item.orgId
+                        },
+                        dFlag: false
+                    },
+                    relations: {
+                        organisation: true
+                    }
+                });
+
+                if (!role) {
+                    throw new AppError(
+                        404,
+                        `Role ${item.roleId} does not belong to Organisation ${item.orgId}`
+                    );
+                }
+
+                const mapping = mappingRepo.create({
+                    user: savedUser,
+                    organisation,
+                    branch,
+                    role
+                });
+
+                await mappingRepo.save(mapping);
+            }
+
+            return savedUser;
+        });
+    }
+
+    async createUser(data: UserCreateDto): Promise<User> {
+        // Created By User
+        const createdByUser = await this.userRepository.findOne({
+            where: {
+                userCode: data.createdBy,
+                dFlag: false,
+            }
+        });
+
+        if (!createdByUser) {
+            throw new AppError(404, "Created By user not found");
+        }
+
+        // Username
+        const existingUser = await this.userRepository.findOne({
+            where: {
+                userName: data.userName,
+                dFlag: false,
+            }
+        });
+
+        if (existingUser) {
+            throw new AppError(409, "Username already exists");
+        }
+        // At least one assignment
+        if (!data.assignments || data.assignments.length === 0) {
+            throw new AppError(
+                400,
+                "Please assign at least one Organisation."
+            );
+        }
+
+        const password = await this.passwordService.hash(
+            data.password
+        );
+
+
+        const userCode = await this.codeService.generateUserCode();
+        return await AppDataSource.transaction(async (manager) => {
+            const userRepo = manager.getRepository(User);
+            const orgRepo = manager.getRepository(Organisation);
+            const branchRepo = manager.getRepository(Branch);
+            const roleRepo = manager.getRepository(Role);
+            const mappingRepo = manager.getRepository(UserOrgBranchRole);
+            // Create User
+            let user = userRepo.create({
+                userName: data.userName,
+                fullName: data.fullName,
+                password: password,
+                userCode: userCode,
+                email: data.email,
+                phoneNumber: data.phoneNumber,
+                status: data.status,
+                createdBy: data.createdBy,
+
+            });
+
+            user = await userRepo.save(user);
+            // Assign multiple organisations
+            for (const assignment of data.assignments) {
+                // Organisation
+                const organisation = await orgRepo.findOne({
+                    where: {
+                        orgId: assignment.orgId,
+                        dFlag: false
+                    }
+                });
+                if (!organisation) {
+                    throw new AppError(
+                        404,
+                        `Organisation ${assignment.orgId} not found`
+                    );
+                }
+                // Branch
+                const branch = await branchRepo.findOne({
+                    where: {
+                        branchId: assignment.branchId,
+                        organisation: {
+                            orgId: organisation.orgId
+
+                        },
+                        dFlag: false
+                    },
+                    relations: {
+                        organisation: true
+                    }
+                });
+                if (!branch) {
+                    throw new AppError(400, `Branch ${assignment.branchId} does not belong to ${organisation.orgName}`);
+                }
+
+                // Role
+                const role = await roleRepo.findOne({
+                    where: {
+                        roleId: assignment.roleId,
+                        organisation: {
+                            orgId: organisation.orgId
+                        },
+                        dFlag: false
+                    },
+                    relations: {
+                        organisation: true
+                    }
+                });
+
+                if (!role) {
+                    throw new AppError(400, `Role ${assignment.roleId} does not belong to ${organisation.orgName}`
+                    );
+                }
+                // Duplicate Assignment
+                const duplicate = await mappingRepo.findOne({
+                    where: {
+                        user: {
+                            userId: user.userId
+                        },
+                        organisation: {
+                            orgId: organisation.orgId
+                        },
+                        branch: {
+                            branchId: branch.branchId
+                        },
+                        role: {
+                            roleId: role.roleId
+                        }
+                    },
+
+                    relations: {
+                        user: true,
+                        organisation: true,
+                        branch: true,
+                        role: true
+                    }
+
+                });
+                if (duplicate) {
+                    throw new AppError(409, `Duplicate assignment found for ${organisation.orgName}`);
+
+                }
+
+                const mapping = mappingRepo.create({
+                    user,
+                    organisation,
+                    branch,
+                    role
+                });
+                await mappingRepo.save(mapping);
+            }
+
+            return user;
+
+        });
+
+    }
 }

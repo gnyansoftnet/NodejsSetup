@@ -41,11 +41,8 @@ export class CodeGenerateService {
     }
 
 
-    async generateUserCode(orgShortName: string | undefined): Promise<string> {
-        if (!orgShortName) {
-            throw new AppError(400, "Organisation short name is required to generate org code");
-        }
-        const prefix = orgShortName.toUpperCase();
+    async generateUserCode(): Promise<string> {
+        const prefix = "USR";
         const lastOrg = await this.userRepository
             .createQueryBuilder("user")
             .where("user.user_code LIKE :prefix", { prefix: `${prefix}%` })
@@ -53,7 +50,7 @@ export class CodeGenerateService {
             .getOne();
 
         if (!lastOrg) {
-            return `USR${prefix}0001`;
+            return `${prefix}0001`;
         }
 
         const lastCodeNumber = parseInt(

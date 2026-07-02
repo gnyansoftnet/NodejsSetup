@@ -1,55 +1,60 @@
-
 import {
     IsString,
     IsNotEmpty,
     IsOptional,
     IsEmail,
     IsEnum,
-    IsDateString,
     Matches,
-    MaxLength,
+    ValidateNested,
+    ArrayMinSize,
     IsInt
 } from "class-validator";
 
+import { Type } from "class-transformer";
 import { UserStatus } from "../constants/user-status.enum";
+
+export class UserAssignmentDto {
+
+    @IsInt()
+    orgId!: number;
+
+    @IsInt()
+    branchId!: number;
+
+    @IsInt()
+    roleId!: number;
+}
 
 export class UserUpdateDto {
 
-    @IsNotEmpty({ message: "userId is required" })
+    @IsInt()
+    @IsNotEmpty()
     userId!: number;
 
     @IsString()
     @IsNotEmpty()
     userName!: string;
 
-    @IsNotEmpty()
     @IsEnum(UserStatus)
     status!: UserStatus;
-
-    @IsNotEmpty({ message: "modifiedBy is required" })
-    modifiedBy!: string;
-
-    @IsInt()
-    @IsNotEmpty()
-    orgId!: number;
-
-    @IsInt()
-    @IsNotEmpty()
-    branchId!: number;
-
-    @IsInt()
-    @IsNotEmpty()
-    roleId!: number;
 
     @IsOptional()
     @IsEmail()
     email?: string;
 
     @IsOptional()
-    @Matches(/^[0-9]{10}$/, { message: "Phone number must be a 10-digit number" })
+    @Matches(/^[0-9]{10}$/)
     phoneNumber?: string;
 
     @IsOptional()
-    fullName?: string
+    fullName?: string;
 
+    @IsString()
+    @IsNotEmpty()
+    modifiedBy!: string;
+
+    @ValidateNested({ each: true })
+    @Type(() => UserAssignmentDto)
+    @ArrayMinSize(1)
+    assignments!: UserAssignmentDto[];
 }
