@@ -39,11 +39,9 @@ export class UserUpdateDto {
     status!: UserStatus;
 
     @IsOptional()
-    @IsEmail()
     email?: string;
 
     @IsOptional()
-    @Matches(/^[0-9]{10}$/)
     phoneNumber?: string;
 
     @IsOptional()

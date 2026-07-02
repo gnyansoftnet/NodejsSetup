@@ -23,7 +23,6 @@ export class OrgCreateDto {
     faxNumber?: string;
 
     @IsOptional()
-    @Matches(/^[0-9]{10}$/, { message: "orgPhone must be 10 digits" })
     orgPhone?: string;
 
 
