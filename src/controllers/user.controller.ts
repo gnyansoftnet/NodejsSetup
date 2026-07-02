@@ -60,7 +60,7 @@ export class UserController {
     });
 
     deleteUser = asyncHandler(async (req: Request, res: Response) => {
-        const userId = Number(req.params.userId);
+        const userId = Number(req.query.userId);
         await this.userService.deleteUser(userId);
         return sendSuccess(res, "User deleted successfully");
     });

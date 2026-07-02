@@ -20,6 +20,7 @@ export class UserRepository extends BaseRepository<User> {
             .createQueryBuilder("user")
             .leftJoinAndSelect("user.userOrgBranches", "uobr")
             .leftJoinAndSelect("uobr.organisation", "org")
+            .leftJoinAndSelect("uobr.role", "role")
             .andWhere("org.orgId = :orgId", { orgId });
         if (search) {
             query.andWhere(
