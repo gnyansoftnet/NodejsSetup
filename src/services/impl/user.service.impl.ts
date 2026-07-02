@@ -50,7 +50,7 @@ export class UserServiceImpl implements IUserService {
     async getUsersByorgId(orgId: number, page: number, limit: number, search?: string): Promise<PaginatedResultDto<User>> {
         const { data, total } = await this.userRepository.findUsersByOrgId(orgId, page, limit, search);
         const filteredUsers = data
-            .filter(user => user.userName == AppConstants.SystemAdminUserName);
+            .filter(user => user.userName != AppConstants.SystemAdminUserName);
         const totalPages = Math.ceil(total / limit);
         return {
             data: filteredUsers,
