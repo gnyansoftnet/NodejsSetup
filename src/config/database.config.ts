@@ -26,6 +26,7 @@ const baseConfig: DataSourceOptions = {
     entities: [path.join(__dirname, "../entities", isProduction ? "*.js" : "*.ts")],
     migrations: [path.join(__dirname, "../migrations", isProduction ? "*.js" : "*.ts")],
     synchronize: false,
+    // subscribers: [path.join(__dirname, "../subscribers", isProduction ? "*.js" : "*.ts")],
     connectTimeout: 10000,
 };
 

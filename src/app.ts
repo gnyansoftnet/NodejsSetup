@@ -12,6 +12,8 @@ import organisationRoute from "./routes/organisation.route";
 import branchRoute from "./routes/branch.route";
 import roleRoute from "./routes/role.route";
 import userRoute from "./routes/user.route";
+import moduleRoute from "./routes/module.route";
+import rolePermissionRoute from "./routes/role-permission.route";
 
 const app = express();
 
@@ -46,10 +48,12 @@ app.get("/management/health", (_req: express.Request, res: express.Response) => 
 });
 
 app.use("/api/auth", authRoute);
+app.use("/api/module", moduleRoute);
 app.use("/api/organisation", organisationRoute);
 app.use("/api/branch", branchRoute);
 app.use("/api/role", roleRoute);
 app.use("/api/user", userRoute);
+app.use("/api/role-permission", rolePermissionRoute);
 
 app.use((req: express.Request, res: express.Response) => {
     res.status(404).json({

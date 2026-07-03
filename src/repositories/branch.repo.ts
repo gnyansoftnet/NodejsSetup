@@ -1,6 +1,9 @@
+import { singleton } from "tsyringe";
 import { Branch } from "../entities/branch.entity";
 import { BaseRepository } from "./base.repo";
 
+
+@singleton()
 export class BranchRepository extends BaseRepository<Branch> {
     constructor() {
         super(Branch, "branchId")

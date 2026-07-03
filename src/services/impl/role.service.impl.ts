@@ -1,7 +1,7 @@
 import { inject, injectable } from "tsyringe";
 import { PaginatedResultDto } from "../../dtos/paginated.result.dto";
 import { Role } from "../../entities/role.entity";
-import { IRoleService } from "../role.serive";
+import { IRoleService } from "../role.service";
 import { UserRepository } from "../../repositories/user.repo";
 import { RoleRepository } from "../../repositories/role.repo";
 import { AppError } from "../../utils/app-error";

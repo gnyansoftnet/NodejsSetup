@@ -1,6 +1,9 @@
+import { singleton } from "tsyringe";
 import { Role } from "../entities/role.entity";
 import { BaseRepository } from "./base.repo";
 
+
+@singleton()
 export class RoleRepository extends BaseRepository<Role> {
     constructor() {
         super(Role, "roleId")

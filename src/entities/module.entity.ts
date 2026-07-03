@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Page } from "./page.entity";
 
 @Entity({ name: "modules" })
 export class Module {
@@ -6,7 +7,7 @@ export class Module {
     @PrimaryGeneratedColumn({ name: "module_id" })
     moduleId!: number;
 
-    @Column({ name: "module_name" })
+    @Column({ name: "module_name" ,unique: true})
     moduleName!: string;
 
     @Column({ name: "module_icon", type: "varchar", nullable: true })
@@ -27,5 +28,8 @@ export class Module {
 
     @Column({ name: "dFlag", default: false })
     dFlag!: boolean
+
+    @OneToMany(() => Page, (page) => page.module)
+    pages!: Page[];
 
 }

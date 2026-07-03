@@ -10,6 +10,8 @@ import { OrganisationServiceImpl } from "../services/impl/organisation.service.i
 import { UserServiceImpl } from "../services/impl/user.service.impl";
 import { BranchServiceImpl } from "../services/impl/branch.service.impl";
 import { RoleSeriviceImpl } from "../services/impl/role.service.impl";
+import { ModuleServiceImpl } from "../services/impl/module.service.impl";
+import { RolePermissionServiceImpl } from "../services/impl/role-permission.service.impl";
 
 container.registerInstance(DataSource, AppDataSource);
 
@@ -18,6 +20,8 @@ container.register("IOrganisationService", { useClass: OrganisationServiceImpl }
 container.register("IBranchService", { useClass: BranchServiceImpl });
 container.register("IUserService", { useClass: UserServiceImpl });
 container.register("IRoleService", { useClass: RoleSeriviceImpl });
+container.register("IModuleService", { useClass: ModuleServiceImpl });
+container.register("IRolePermissionService", { useClass: RolePermissionServiceImpl });
 
 
 container.registerSingleton(PasswordService);

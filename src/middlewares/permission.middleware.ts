@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import { RolePermission } from "../entities/role-permission.entity";
 import { UserPermission } from "../entities/user-permission.entity";
-import { UserOrgBranch } from "../entities/user-org-branch-role.entity";
 import { AppError } from "../utils/app-error";
 import { AppDataSource } from "../config/database.config";
+import { UserOrgBranchRole } from "../entities/user-org-branch-role.entity";
 
 export type PermissionAction = "canRead" | "canWrite" | "canUpdate" | "canDelete";
 
@@ -45,7 +45,7 @@ export const permissionMiddleware = (pgId: number) => {
                 throw new AppError(405, `Unsupported HTTP method: ${req.method}`);
             }
 
-            const userOrgBranch = await AppDataSource.getRepository(UserOrgBranch).findOne({
+            const userOrgBranch = await AppDataSource.getRepository(UserOrgBranchRole).findOne({
                 where: {
                     user: { userId },
                     organisation: { orgId },

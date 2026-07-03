@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Module } from "./module.entity";
 
 @Entity({ name: "pages" })
 export class Page {
@@ -6,7 +7,7 @@ export class Page {
     pageId!: number;
 
 
-    @Column({ name: "page_name" })
+    @Column({ name: "page_name", unique: true })
     pageName!: string;
 
 
@@ -28,6 +29,10 @@ export class Page {
 
     @Column({ name: "dFlag", default: false })
     dFlag!: boolean
+
+    @ManyToOne(() => Module)
+    @JoinColumn({ name: "module_id" })
+    module!: Module;
 
 
 

@@ -1,5 +1,5 @@
 import { inject, injectable, singleton } from "tsyringe";
-import { IRoleService } from "../services/role.serive";
+import { IRoleService } from "../services/role.service";
 import { Request, Response, NextFunction } from "express";
 import { asyncHandler } from "../utils/async.handler";
 import { sendCreated, sendSuccess } from "../utils/response.util";
