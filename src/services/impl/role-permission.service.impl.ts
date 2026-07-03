@@ -7,6 +7,7 @@ import { RolePermission } from "../../entities/role-permission.entity";
 import { RolePermissionUpdateDto } from "../../dtos/role-prmission-update.dto";
 import { DataSource, In } from "typeorm";
 import { AppError } from "../../utils/app-error";
+import { UserRepository } from "../../repositories/user.repo";
 
 
 
@@ -16,6 +17,8 @@ export class RolePermissionServiceImpl implements IRolePermissionService {
     constructor(
         @inject(RolePermissionRepository)
         private rolePermissionRepo: RolePermissionRepository,
+        @inject(UserRepository)
+        private userRepository: UserRepository,
         @inject(DataSource)
         private dataSource: DataSource,
     ) { }

@@ -53,10 +53,7 @@ export class RoleSeriviceImpl implements IRoleService {
         });
         if (!org) throw new AppError(404, "Organisation not found!");
 
-        const role = await this.roleRepo.exists({
-            where: { roleName: roleName, dFlag: false }
-        });
-        if (role) throw new AppError(400, "Role already exist!");
+
         const updateRole = await this.roleRepo.update(roleId, {
             roleName: roleName,
             modifiedBy: modifiedBy,

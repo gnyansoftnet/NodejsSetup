@@ -20,6 +20,7 @@ import { UserOrgBranchRole } from "../../entities/user-org-branch-role.entity";
 import { Organisation } from "../../entities/organisation.entity";
 import { Branch } from "../../entities/branch.entity";
 import { Role } from "../../entities/role.entity";
+import { DataSource } from "typeorm";
 
 
 
@@ -44,6 +45,8 @@ export class UserServiceImpl implements IUserService {
         private userOrgBranchRepo: UserOrgBranchRoleRepository,
         @inject(CodeGenerateService)
         private codeService: CodeGenerateService,
+        @inject(DataSource)
+        private dataSource: DataSource,
     ) { }
 
 
@@ -227,7 +230,7 @@ export class UserServiceImpl implements IUserService {
 
 
 
-        return await AppDataSource.transaction(async manager => {
+        return await this.dataSource.transaction(async manager => {
 
             const userRepo = manager.getRepository(User);
             const mappingRepo = manager.getRepository(UserOrgBranchRole);
@@ -351,7 +354,7 @@ export class UserServiceImpl implements IUserService {
 
 
         const userCode = await this.codeService.generateUserCode();
-        return await AppDataSource.transaction(async (manager) => {
+        return await this.dataSource.transaction(async (manager) => {
             const userRepo = manager.getRepository(User);
             const orgRepo = manager.getRepository(Organisation);
             const branchRepo = manager.getRepository(Branch);
