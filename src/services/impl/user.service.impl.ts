@@ -184,7 +184,6 @@ export class UserServiceImpl implements IUserService {
     }
 
     async updateUser(data: UserUpdateDto): Promise<User> {
-
         const modifiedBy = await this.userRepository.findOne({
             where: {
                 userCode: data.modifiedBy,

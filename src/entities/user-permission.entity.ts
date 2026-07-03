@@ -80,4 +80,8 @@ export class UserPermission {
         name: "modified_date"
     })
     modifiedDate!: Date;
+
+    @Column({ name: "dFlag", default: false })
+    dFlag!: boolean
+
 }

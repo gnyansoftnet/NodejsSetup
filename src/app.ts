@@ -14,6 +14,7 @@ import roleRoute from "./routes/role.route";
 import userRoute from "./routes/user.route";
 import moduleRoute from "./routes/module.route";
 import rolePermissionRoute from "./routes/role-permission.route";
+import userPermissionRoute from "./routes/user-permission.route";
 
 const app = express();
 
@@ -54,6 +55,7 @@ app.use("/api/branch", branchRoute);
 app.use("/api/role", roleRoute);
 app.use("/api/user", userRoute);
 app.use("/api/role-permission", rolePermissionRoute);
+app.use("/api/user-permission", userPermissionRoute);
 
 app.use((req: express.Request, res: express.Response) => {
     res.status(404).json({

@@ -12,6 +12,7 @@ import { BranchServiceImpl } from "../services/impl/branch.service.impl";
 import { RoleSeriviceImpl } from "../services/impl/role.service.impl";
 import { ModuleServiceImpl } from "../services/impl/module.service.impl";
 import { RolePermissionServiceImpl } from "../services/impl/role-permission.service.impl";
+import { UserPermissionServiceImpl } from "../services/impl/user-permission.service.impl";
 
 container.registerInstance(DataSource, AppDataSource);
 
@@ -21,6 +22,7 @@ container.register("IBranchService", { useClass: BranchServiceImpl });
 container.register("IUserService", { useClass: UserServiceImpl });
 container.register("IRoleService", { useClass: RoleSeriviceImpl });
 container.register("IModuleService", { useClass: ModuleServiceImpl });
+container.register("IUserPermissionService", { useClass: UserPermissionServiceImpl });
 container.register("IRolePermissionService", { useClass: RolePermissionServiceImpl });
 
 

@@ -1,22 +1,20 @@
 import { inject, injectable } from "tsyringe";
-import { Module } from "../../entities/module.entity";
-import { IModuleService } from "../module.service";
-import { RolePermissionRepository } from "../../repositories/role-permission.repo";
-import { IRolePermissionService } from "../role-permission.service";
-import { RolePermission } from "../../entities/role-permission.entity";
-import { RolePermissionUpdateDto } from "../../dtos/role-prmission-update.dto";
 import { DataSource, In } from "typeorm";
 import { AppError } from "../../utils/app-error";
 import { UserRepository } from "../../repositories/user.repo";
+import { IUserPermissionService } from "../user-permission.service";
+import { UserPermissionUpdateDto } from "../../dtos/user-permission-update.dto";
+import { UserPermission } from "../../entities/user-permission.entity";
+import { UserPermissionRepository } from "../../repositories/user-permission.repo";
 
 
 
 @injectable()
-export class RolePermissionServiceImpl implements IRolePermissionService {
+export class UserPermissionServiceImpl implements IUserPermissionService {
 
     constructor(
-        @inject(RolePermissionRepository)
-        private rolePermissionRepo: RolePermissionRepository,
+        @inject(UserPermissionRepository)
+        private userPermissionRepo: UserPermissionRepository,
         @inject(UserRepository)
         private userRepository: UserRepository,
         @inject(DataSource)
@@ -24,18 +22,21 @@ export class RolePermissionServiceImpl implements IRolePermissionService {
     ) { }
 
 
-    async getRolePermissionsByroleId(roleId: number): Promise<RolePermission[]> {
-        return await this.rolePermissionRepo.findAll(
+
+    async getUserPermissionsByuserId(userId: number): Promise<UserPermission[]> {
+        return await this.userPermissionRepo.findAll(
             {
                 where: {
                     dFlag: false,
-                    role: { roleId: roleId },
+                    user: { userId },
                 },
                 relations: {
                     page: {
                         module: true,
+
                     },
-                    role: true,
+                    user: true,
+
                 }
             },
 
@@ -43,35 +44,35 @@ export class RolePermissionServiceImpl implements IRolePermissionService {
     }
 
 
-    async updateRolePermissions(
-        roleId: number,
-        permissions: RolePermissionUpdateDto[],
+    async updateUserPermissions(
+        userId: number,
+        permissions: UserPermissionUpdateDto[],
         modifiedBy: string
-    ): Promise<RolePermission[]> {
+    ): Promise<UserPermission[]> {
         return await this.dataSource.transaction(async (manager) => {
-            const rolePermissionRepo = manager.getRepository(RolePermission);
+            const userPermissionRepo = manager.getRepository(UserPermission);
             const user = await this.userRepository.findOne({ where: { userCode: modifiedBy, dFlag: false } });
             if (!user) {
                 throw new AppError(404, 'User not found');
             }
-            const ids = permissions.map(p => p.rolePermissionId);
-            const existingPermissions = await rolePermissionRepo.find({
+            const ids = permissions.map(p => p.userPermissionId);
+            const existingPermissions = await userPermissionRepo.find({
                 where: {
-                    rolePermissionId: In(ids),
-                    role: { roleId },
+                    userPermissionId: In(ids),
+                    user: { userId },
                     dFlag: false,
                 },
             });
 
             if (existingPermissions.length !== permissions.length) {
-                throw new AppError(404, 'One or more role permissions not found for this role');
+                throw new AppError(404, 'One or more user permissions not found for this user');
             }
 
-            const updated: RolePermission[] = [];
+            const updated: UserPermission[] = [];
 
             for (const perm of permissions) {
                 const record = existingPermissions.find(
-                    (rp) => rp.rolePermissionId === perm.rolePermissionId
+                    (rp) => rp.userPermissionId === perm.userPermissionId
                 );
 
                 if (!record) continue;
@@ -85,7 +86,7 @@ export class RolePermissionServiceImpl implements IRolePermissionService {
                 updated.push(record);
             }
 
-            return await rolePermissionRepo.save(updated);
+            return await userPermissionRepo.save(updated);
         });
     }
 
