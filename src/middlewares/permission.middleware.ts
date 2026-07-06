@@ -5,6 +5,7 @@ import { AppError } from "../utils/app-error";
 import { AppDataSource } from "../config/database.config";
 import { UserOrgBranchRole } from "../entities/user-org-branch-role.entity";
 import { AppConstants } from "../constants/app.constants";
+import { Role } from "../entities/role.entity";
 
 export type PermissionAction = "canRead" | "canWrite" | "canUpdate" | "canDelete";
 
@@ -17,15 +18,10 @@ const METHOD_PERMISSION_MAP: Record<string, PermissionAction> = {
 };
 
 
-const isSystemAdminRole = (role: any): boolean => {
+const isSystemAdminRole = (role: Role): boolean => {
     if (!role) return false;
-    return (
-        role.isSystemAdmin === true ||
-        (typeof role.roleName === "string" &&
-            role.roleName.trim().toLowerCase() === AppConstants.SystemAdminRoleName.toLowerCase())
-    );
+    return role.roleName.trim().toLowerCase() === AppConstants.SystemAdminRoleName.toLowerCase();
 };
-
 
 
 export const permissionMiddleware = (pgId: number) => {
@@ -60,6 +56,9 @@ export const permissionMiddleware = (pgId: number) => {
                     branch: { branchId },
                     role: { roleId },
                 },
+                relations: {
+                    role: true
+                }
             });
 
             if (!userOrgBranch) {
