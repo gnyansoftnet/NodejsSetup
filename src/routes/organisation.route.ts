@@ -11,7 +11,7 @@ import { OrgUpdateDto } from "../dtos/org-update.dto";
 const router = Router();
 const controller = container.resolve(OrganisationController);
 router.use(authMiddleware);
-// router.use(permissionMiddleware(PageId.ORGANISATION));
+router.use(permissionMiddleware(PageId.ORGANISATION));
 router.post("/createOrganisation", validateDto(OrgCreateDto), controller.createOrganisation);
 router.put("/updateOrganisation", validateDto(OrgUpdateDto), controller.updateOrganisation);
 router.delete("/deleteOrganisation", controller.deleteOrganisation);
