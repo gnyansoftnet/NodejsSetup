@@ -46,7 +46,6 @@ export class RoleSeriviceImpl implements IRoleService {
         });
         if (roleExists) throw new AppError(400, "Role already exist!");
 
-        // fetch all pages BEFORE transaction (validation reads outside txn)
         const allPages = await this.pageRepo.findAll({
             where: { dFlag: false }
         });

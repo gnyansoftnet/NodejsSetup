@@ -21,6 +21,8 @@ import { Organisation } from "../../entities/organisation.entity";
 import { Branch } from "../../entities/branch.entity";
 import { Role } from "../../entities/role.entity";
 import { DataSource } from "typeorm";
+import { PageRepository } from "../../repositories/page.repo";
+import { UserPermission } from "../../entities/user-permission.entity";
 
 
 
@@ -47,6 +49,8 @@ export class UserServiceImpl implements IUserService {
         private codeService: CodeGenerateService,
         @inject(DataSource)
         private dataSource: DataSource,
+        @inject(PageRepository)
+        private pageRepo: PageRepository,
     ) { }
 
 
@@ -315,6 +319,8 @@ export class UserServiceImpl implements IUserService {
         });
     }
 
+
+
     async createUser(data: UserCreateDto): Promise<User> {
         // Created By User
         const createdByUser = await this.userRepository.findOne({
@@ -351,14 +357,21 @@ export class UserServiceImpl implements IUserService {
             data.password
         );
 
-
         const userCode = await this.codeService.generateUserCode();
+
+        // fetch all pages BEFORE transaction (validation reads outside txn)
+        const allPages = await this.pageRepo.findAll({
+            where: { dFlag: false }
+        });
+
         return await this.dataSource.transaction(async (manager) => {
             const userRepo = manager.getRepository(User);
             const orgRepo = manager.getRepository(Organisation);
             const branchRepo = manager.getRepository(Branch);
             const roleRepo = manager.getRepository(Role);
             const mappingRepo = manager.getRepository(UserOrgBranchRole);
+            const userPermissionRepo = manager.getRepository(UserPermission);
+
             // Create User
             let user = userRepo.create({
                 userName: data.userName,
@@ -369,10 +382,25 @@ export class UserServiceImpl implements IUserService {
                 phoneNumber: data.phoneNumber,
                 status: data.status,
                 createdBy: data.createdBy,
-
             });
 
             user = await userRepo.save(user);
+
+            // Default permissions for every page, all false
+            const userPermissions = allPages.map((page) =>
+                userPermissionRepo.create({
+                    user,
+                    page,
+                    canRead: false,
+                    canWrite: false,
+                    canUpdate: false,
+                    canDelete: false,
+                    createdBy: data.createdBy,
+                    dFlag: false,
+                })
+            );
+            await userPermissionRepo.save(userPermissions);
+
             // Assign multiple organisations
             for (const assignment of data.assignments) {
                 // Organisation
@@ -394,7 +422,6 @@ export class UserServiceImpl implements IUserService {
                         branchId: assignment.branchId,
                         organisation: {
                             orgId: organisation.orgId
-
                         },
                         dFlag: false
                     },
@@ -440,18 +467,15 @@ export class UserServiceImpl implements IUserService {
                             roleId: role.roleId
                         }
                     },
-
                     relations: {
                         user: true,
                         organisation: true,
                         branch: true,
                         role: true
                     }
-
                 });
                 if (duplicate) {
                     throw new AppError(409, `Duplicate assignment found for ${organisation.orgName}`);
-
                 }
 
                 const mapping = mappingRepo.create({
@@ -464,8 +488,6 @@ export class UserServiceImpl implements IUserService {
             }
 
             return user;
-
         });
-
     }
 }
