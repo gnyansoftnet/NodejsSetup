@@ -4,6 +4,7 @@ import { UserPermission } from "../entities/user-permission.entity";
 import { AppError } from "../utils/app-error";
 import { AppDataSource } from "../config/database.config";
 import { UserOrgBranchRole } from "../entities/user-org-branch-role.entity";
+import { AppConstants } from "../constants/app.constants";
 
 export type PermissionAction = "canRead" | "canWrite" | "canUpdate" | "canDelete";
 
@@ -14,6 +15,17 @@ const METHOD_PERMISSION_MAP: Record<string, PermissionAction> = {
     PATCH: "canUpdate",
     DELETE: "canDelete",
 };
+
+
+const isSystemAdminRole = (role: any): boolean => {
+    if (!role) return false;
+    return (
+        role.isSystemAdmin === true ||
+        (typeof role.roleName === "string" &&
+            role.roleName.trim().toLowerCase() === AppConstants.SystemAdminRoleName.toLowerCase())
+    );
+};
+
 
 
 export const permissionMiddleware = (pgId: number) => {
@@ -54,6 +66,10 @@ export const permissionMiddleware = (pgId: number) => {
                 throw new AppError(403,
                     `User '${userId}' is not assigned to org '${orgId}', branch '${branchId}', role '${roleId}'.`,
                 );
+            }
+
+            if (isSystemAdminRole(userOrgBranch.role)) {
+                return next();
             }
 
             // Check RolePermission (role + page) and UserPermission (user + page) in parallel
