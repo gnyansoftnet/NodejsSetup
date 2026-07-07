@@ -18,8 +18,13 @@ export class ModuleServiceImpl implements IModuleService {
             {
                 where: { dFlag: false },
                 relations: {
-                    pages: true
+                    pages: true,
+
+                },
+                order: {
+                    moduleId: "DESC",
                 }
+
             },
 
         );
