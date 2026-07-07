@@ -14,20 +14,21 @@ export class ModuleServiceImpl implements IModuleService {
 
 
     async getModules(): Promise<Module[]> {
-        return await this.moduleRepo.findAll(
+        const modules = await this.moduleRepo.findAll(
             {
                 where: { dFlag: false },
                 relations: {
                     pages: true,
-
                 },
-                order: {
-                    moduleId: "DESC",
-                }
 
             },
 
         );
+        modules.forEach(module => {
+            module.pages.reverse();
+        });
+
+        return modules;
     }
 
 
