@@ -107,11 +107,11 @@ export class RoleSeriviceImpl implements IRoleService {
     }
     async getRolesByOrgId(orgId: number, page: number, limit: number, search?: string): Promise<PaginatedResultDto<Role>> {
         const { data, total } = await this.roleRepo.findRolePaginated(orgId, page, limit, search);
-        const filteredRoles = data
-            .filter(user => user.roleName != AppConstants.SystemAdminRoleName);
+        // const filteredRoles = data
+        //     .filter(user => user.roleName != AppConstants.SystemAdminRoleName);
         const totalPages = Math.ceil(total / limit);
         return {
-            data: filteredRoles,
+            data,
             pagination: {
                 total,
                 page,
