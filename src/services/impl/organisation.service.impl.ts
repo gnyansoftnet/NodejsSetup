@@ -55,15 +55,15 @@ export class OrganisationServiceImpl implements IOrganisationService {
             orgCode: orgCode,
             address: data.address,
             orgPhone: data.orgPhone,
-            tinNumber: data.tinNumber,
+
             orgGSTINNumber: data.orgGSTINNumber,
             orgLogo: data.logo,
-            faxNumber: data.faxNumber,
+
             orgPAN: data.orgPAN,
             orgRegNumber: data.orgRegNumber,
-            cashAccountNumber: data.cashAccountNumber,
-            wesite: data.website,
-            serviceTax: data.serviceTax,
+
+
+
             orgEmail: data.orgEmail,
             dFlag: false,
             createdBy: data.createdBy,
@@ -96,16 +96,16 @@ export class OrganisationServiceImpl implements IOrganisationService {
             orgShortName: data.orgShortName,
             address: data.address,
             orgPhone: data.orgPhone,
-            tinNumber: data.tinNumber,
+
             orgGSTINNumber: data.orgGSTINNumber,
             orgLogo: data.logo,
-            faxNumber: data.faxNumber,
+
             orgPAN: data.orgPAN,
             orgRegNumber: data.orgRegNumber,
-            cashAccountNumber: data.cashAccountNumber,
-            wesite: data.website,
+
+
             orgEmail: data.orgEmail,
-            serviceTax: data.serviceTax,
+
             modifiedBy: data.modifiedBy,
         }
         );
