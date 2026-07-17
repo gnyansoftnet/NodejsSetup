@@ -19,6 +19,18 @@ import userPermissionRoute from "./routes/user-permission.route";
 const app = express();
 
 
+app.use(helmet());
+app.use(rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    message: { success: false, message: "Too many requests, please try again later." }
+}));
+
+app.use(compression());
+app.use(express.json({ limit: "10kb" }));
+app.use(express.urlencoded({ extended: true, limit: "10kb" }));
+app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
+
 if (process.env.NODE_ENV !== "production") {
     app.use(corsLogger);
 }
