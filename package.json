@@ -6,14 +6,18 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "rimraf dist && tsc",
-    "prestart": "npm run migration:run",
     "start": "node dist/server.js",
+    "prestart": "npm run migration:run:prod",
     "typeorm": "typeorm-ts-node-commonjs -d src/config/database.config.ts",
     "migration:generate": "npm run typeorm -- migration:generate src/migrations/Migration",
     "migration:run": "npm run typeorm -- migration:run",
     "migration:revert": "npm run typeorm -- migration:revert",
     "migration:show": "npm run typeorm -- migration:show",
-    "migration:create": "typeorm-ts-node-commonjs migration:create"
+    "migration:create": "typeorm-ts-node-commonjs migration:create",
+    "typeorm:prod": "typeorm -d dist/config/database.config.js",
+    "migration:run:prod": "npm run typeorm:prod -- migration:run",
+    "migration:show:prod": "npm run typeorm:prod -- migration:show",
+    "migration:revert:prod": "npm run typeorm:prod -- migration:revert"
   },
   "keywords": [],
   "author": "",

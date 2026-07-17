@@ -4,28 +4,6 @@ import dotenv from "dotenv";
 import path from "path";
 import fs from "fs";
 
-// dotenv.config({
-//     path: path.join(process.cwd(), ".env")
-// });
-
-
-
-// console.log("=== ENV DEBUG ===");
-// console.log("process.cwd():", process.cwd());
-// console.log("Looking for .env at:", path.join(process.cwd(), ".env"));
-// console.log("File exists?:", require("fs").existsSync(path.join(process.cwd(), ".env")));
-// console.log("==================");
-
-
-// const requiredEnvVars = ["DB_HOST", "DB_PORT", "DB_USERNAME", "DB_PASSWORD", "DB_DATABASE"];
-// for (const key of requiredEnvVars) {
-//     if (!process.env[key]) {
-//         throw new Error(`❌ Missing required environment variable: ${key}`);
-//     }
-// }
-
-
-
 const envPath = path.join(__dirname, "../../.env");
 
 if (fs.existsSync(envPath)) {

@@ -1,31 +1,24 @@
 import "reflect-metadata";
 import dotenv from "dotenv";
 import path from "path";
+import fs from "fs";
 
-// dotenv.config({
-//     path: path.join(process.cwd(), ".env")
-// });
+const envPath = path.join(__dirname, "../.env");
+if (fs.existsSync(envPath)) {
+    dotenv.config({ path: envPath });
+} else {
+    console.warn(`⚠️ No .env file found at ${envPath}`);
+}
 
 import app from "./app";
 import { AppDataSource } from "./config/database.config";
 import { logger } from "./utils/logger";
 import { seedAdminUser } from "./seed/admin.seed";
-import { validateEnv } from "./utils/validate-env";
 
 const PORT = process.env.PORT || 3000;
 
-process.on("unhandledRejection", (reason) => {
-    logger.error("Unhandled Rejection:", reason);
-    process.exit(1);
-});
-
-process.on("uncaughtException", (error) => {
-    logger.error("Uncaught Exception:", error);
-    process.exit(1);
-});
 
 const startServer = async () => {
-    validateEnv();
     try {
         await AppDataSource.initialize();
         logger.info("Database connected ✅");
@@ -58,7 +51,7 @@ const startServer = async () => {
             server.close(async () => {
                 await AppDataSource.destroy();
                 logger.info("Database connection closed");
-                process.exit(0);
+
             });
         };
 
@@ -67,7 +60,7 @@ const startServer = async () => {
 
     } catch (error) {
         logger.error("Server startup failed ❌", error);
-        process.exit(1);
+
     }
 };
 
