@@ -34,6 +34,7 @@ const baseConfig: DataSourceOptions = {
     synchronize: false,
     // subscribers: [path.join(__dirname, "../subscribers", isProduction ? "*.js" : "*.ts")],
     connectTimeout: 10000,
+    // migrationsRun: true,
 };
 
 const devConfig: DataSourceOptions = {

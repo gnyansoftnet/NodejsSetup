@@ -1,4 +1,3 @@
-// src/container/index.ts
 import "reflect-metadata";
 import { container } from "tsyringe";
 import { PasswordService } from "../services/password.service";
