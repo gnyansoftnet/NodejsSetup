@@ -3,14 +3,15 @@ import { Request, Response, NextFunction } from "express";
 import { asyncHandler } from "../utils/async.handler";
 import { sendSuccess } from "../utils/response.util";
 import { requirePositiveInt, requireString } from "../utils/validators";
-import { IUserPermissionService } from "../services/user-permission.service";
+import { IUserPermissionService } from "../services/interfaces/user-permission-service.interface";
 import { UserPermissionUpdateDto } from "../dtos/user-permission-update.dto";
+import { TOKENS } from "../di/tokens";
 
 @singleton()
 @injectable()
 export class UserPermissionController {
     constructor(
-        @inject("IUserPermissionService")
+        @inject(TOKENS.UserPermissionService)
         private userPermissionService: IUserPermissionService,
     ) { }
 

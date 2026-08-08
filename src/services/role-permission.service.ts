@@ -1,8 +1,93 @@
-import { RolePermissionUpdateDto } from "../dtos/role-prmission-update.dto";
+import { inject, injectable } from "tsyringe";
+import { Module } from "../entities/module.entity";
+import { IModuleService } from "./interfaces/module-service.interface";
+import { RolePermissionRepository } from "../repositories/role-permission.repo";
+import { IRolePermissionService } from "./interfaces/role-permission-service.interface";
 import { RolePermission } from "../entities/role-permission.entity";
+import { RolePermissionUpdateDto } from "../dtos/role-prmission-update.dto";
+import { DataSource, In } from "typeorm";
+import { AppError } from "../utils/app-error";
+import { UserRepository } from "../repositories/user.repo";
 
-export interface IRolePermissionService {
-    getRolePermissionsByroleId(roleId: number): Promise<RolePermission[]>;
-    updateRolePermissions(roleId: number, permissions: RolePermissionUpdateDto[], modifiedBy: string): Promise<RolePermission[]>;
+
+
+@injectable()
+export class RolePermissionService implements IRolePermissionService {
+
+    constructor(
+        @inject(RolePermissionRepository)
+        private rolePermissionRepo: RolePermissionRepository,
+        @inject(UserRepository)
+        private userRepository: UserRepository,
+        @inject(DataSource)
+        private dataSource: DataSource,
+    ) { }
+
+
+    async getRolePermissionsByroleId(roleId: number): Promise<RolePermission[]> {
+        return await this.rolePermissionRepo.findAll(
+            {
+                where: {
+                    dFlag: false,
+                    role: { roleId: roleId },
+                },
+                relations: {
+                    page: {
+                        module: true,
+                    },
+                    role: true,
+                }
+            },
+
+        );
+    }
+
+
+    async updateRolePermissions(
+        roleId: number,
+        permissions: RolePermissionUpdateDto[],
+        modifiedBy: string
+    ): Promise<RolePermission[]> {
+        return await this.dataSource.transaction(async (manager) => {
+            const rolePermissionRepo = manager.getRepository(RolePermission);
+            const user = await this.userRepository.findOne({ where: { userCode: modifiedBy, dFlag: false } });
+            if (!user) {
+                throw new AppError(404, 'User not found');
+            }
+            const ids = permissions.map(p => p.rolePermissionId);
+            const existingPermissions = await rolePermissionRepo.find({
+                where: {
+                    rolePermissionId: In(ids),
+                    role: { roleId },
+                    dFlag: false,
+                },
+            });
+
+            if (existingPermissions.length !== permissions.length) {
+                throw new AppError(404, 'One or more role permissions not found for this role');
+            }
+
+            const updated: RolePermission[] = [];
+
+            for (const perm of permissions) {
+                const record = existingPermissions.find(
+                    (rp) => rp.rolePermissionId === perm.rolePermissionId
+                );
+
+                if (!record) continue;
+
+                record.canRead = perm.canRead;
+                record.canWrite = perm.canWrite;
+                record.canUpdate = perm.canUpdate;
+                record.canDelete = perm.canDelete;
+                record.modifiedBy = modifiedBy;
+
+                updated.push(record);
+            }
+
+            return await rolePermissionRepo.save(updated);
+        });
+    }
+
 
 }

@@ -1,18 +1,19 @@
 import { inject, injectable, singleton } from "tsyringe";
 import { Request, Response, NextFunction } from "express";
 import { asyncHandler } from "../utils/async.handler";
-import { IModuleService } from "../services/module.service";
+import { IModuleService } from "../services/interfaces/module-service.interface";
 import { sendSuccess } from "../utils/response.util";
-import { IRolePermissionService } from "../services/role-permission.service";
+import { IRolePermissionService } from "../services/interfaces/role-permission-service.interface";
 import { requirePositiveInt, requireString } from "../utils/validators";
 import { RolePermissionUpdateDto } from "../dtos/role-prmission-update.dto";
+import { TOKENS } from "../di/tokens";
 
 @singleton()
 @injectable()
 export class RolePermissionController {
     constructor(
-        @inject("IRolePermissionService")
-        private rolePermissionService: IRolePermissionService,
+        @inject(TOKENS.RolePermissionService)
+        private readonly rolePermissionService: IRolePermissionService,
     ) { }
 
     getRolePermissionsByroleId = asyncHandler(async (req: Request, res: Response) => {

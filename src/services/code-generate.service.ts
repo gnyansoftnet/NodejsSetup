@@ -1,8 +1,9 @@
 import { inject, injectable, singleton } from "tsyringe";
-import { AppError } from "../utils/app-error";
 import { OrganisationRepository } from "../repositories/organisation.repo";
 import { BranchRepository } from "../repositories/branch.repo";
 import { UserRepository } from "../repositories/user.repo";
+import { AppError } from "../utils/app-error";
+
 
 @singleton()
 @injectable()

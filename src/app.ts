@@ -1,5 +1,5 @@
+import "./di/bootstrap";
 import express from "express";
-import "./container/container";
 import helmet from "helmet";
 import compression from "compression";
 import morgan from "morgan";
@@ -15,6 +15,9 @@ import userRoute from "./routes/user.route";
 import moduleRoute from "./routes/module.route";
 import rolePermissionRoute from "./routes/role-permission.route";
 import userPermissionRoute from "./routes/user-permission.route";
+
+
+
 
 const app = express();
 

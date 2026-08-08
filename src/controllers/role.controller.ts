@@ -1,16 +1,17 @@
 import { inject, injectable, singleton } from "tsyringe";
-import { IRoleService } from "../services/role.service";
+import { IRoleService } from "../services/interfaces/role-service.interface";
 import { Request, Response, NextFunction } from "express";
 import { asyncHandler } from "../utils/async.handler";
 import { sendCreated, sendSuccess } from "../utils/response.util";
 import { requirePositiveInt, requireString } from "../utils/validators";
+import { TOKENS } from "../di/tokens";
 
 @singleton()
 @injectable()
 export class RoleController {
     constructor(
-        @inject("IRoleService")
-        private roleService: IRoleService
+        @inject(TOKENS.RoleService)
+        private readonly roleService: IRoleService
     ) { }
 
 

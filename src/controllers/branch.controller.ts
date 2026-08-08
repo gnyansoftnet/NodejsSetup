@@ -2,16 +2,17 @@ import { inject, injectable, singleton } from "tsyringe";
 import { asyncHandler } from "../utils/async.handler";
 import { Request, Response, NextFunction } from "express";
 import { sendCreated, sendSuccess } from "../utils/response.util";
-import { IBranchService } from "../services/branch.service";
+import { IBranchService } from "../services/interfaces/branch-service.interface";
 import { BranchCreateDto } from "../dtos/branch-create.dto";
 import { BranchUpdateDto } from "../dtos/branch-update.dto";
+import { TOKENS } from "../di/tokens";
 
 @singleton()
 @injectable()
 export class BranchController {
     constructor(
-        @inject("IBranchService")
-        private branchService: IBranchService
+        @inject(TOKENS.BranchService)
+        private readonly branchService: IBranchService
     ) { }
 
     createBranch = asyncHandler(async (req: Request, res: Response) => {

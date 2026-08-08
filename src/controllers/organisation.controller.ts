@@ -2,16 +2,17 @@ import { inject, injectable, singleton } from "tsyringe";
 import { asyncHandler } from "../utils/async.handler";
 import { Request, Response, NextFunction } from "express";
 import { sendCreated, sendSuccess } from "../utils/response.util";
-import { IOrganisationService } from "../services/organisation.service";
+import { IOrganisationService } from "../services/interfaces/organisation-service.interface";
 import { OrgCreateDto } from "../dtos/org-create.dto";
 import { OrgUpdateDto } from "../dtos/org-update.dto";
+import { TOKENS } from "../di/tokens";
 
 @singleton()
 @injectable()
 export class OrganisationController {
     constructor(
-        @inject("IOrganisationService")
-        private orgService: IOrganisationService
+        @inject(TOKENS.OrganisationService)
+        private readonly orgService: IOrganisationService
     ) { }
 
     createOrganisation = asyncHandler(async (req: Request, res: Response) => {

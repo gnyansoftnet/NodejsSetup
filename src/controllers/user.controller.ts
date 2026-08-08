@@ -2,17 +2,18 @@ import { inject, injectable } from "tsyringe";
 import { asyncHandler } from "../utils/async.handler";
 import { Request, Response, NextFunction } from "express";
 import { sendCreated, sendSuccess } from "../utils/response.util";
-import { IUserService } from "../services/user.service";
+import { IUserService } from "../services/interfaces/user-service.interface";
 import { UserCreateDto } from "../dtos/user-create.dto";
 import { UserUpdateDto } from "../dtos/user-update.dto";
+import { TOKENS } from "../di/tokens";
 
 
 @injectable()
 export class UserController {
 
     constructor(
-        @inject("IUserService")
-        private userService: IUserService
+        @inject(TOKENS.UserService)
+        private readonly userService: IUserService
     ) { }
 
     loginUser = asyncHandler(async (req: Request, res: Response) => {
